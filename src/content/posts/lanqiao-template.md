@@ -1,0 +1,61 @@
+---
+title: 蓝桥杯 C++ 必背模板：快速幂
+published: 2026-04-04
+category: 算法竞赛
+tags: [C++, 蓝桥杯]
+---
+
+### 1. 核心代码模板
+
+下面是快速幂的模板，注意别忘记取模：
+
+```cpp
+#include <iostream>
+using namespace std;
+
+typedef long long ll;
+
+ll qpow(ll a, ll b, ll m) {
+    ll res = 1;
+    a %= m;
+    while (b > 0) {
+        if (b & 1) res = res * a % m;
+        a = a * a % m;
+        b >>= 1;
+    }
+    return res;
+}
+
+int main() {
+    cout << qpow(2, 10, 1e9+7) << endl;
+    return 0;
+}
+```
+
+<style>
+.problem-link {
+  display: inline-block;
+  width: 280px;
+  padding: 12px 24px;
+  background-color: #FFB366;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.problem-link:hover {
+  background-color: #E65100;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+</style>
+
+<div style="text-align: center; margin: 20px 0;">
+  <a href="https://codeforces.com" target="_blank" class="problem-link">
+    🚀 题目传送门
+  </a>
+</div>

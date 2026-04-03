@@ -112,6 +112,29 @@
     }
 }
 
+/* 模拟 VS Code 原生代码质感 */
+code, pre, kbd, samp {
+  /* 按照 VS Code 的字体优先级排列：Consolas 是核心 */
+  font-family: Consolas, "Courier New", monospace !important;
+  
+  /* 解决“变细”的问题：强制使用 500 或 600 的字重 */
+  font-weight: 500 !important;
+  
+  /* 调整行高，让代码看起来不那么拥挤，更有编辑器那种呼吸感 */
+  line-height: 1.6 !important;
+  
+  /* 稍微加深一点颜色，让字迹更清晰 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 针对代码块容器的微调 */
+pre {
+  padding: 1.25rem !important;
+  border-radius: 0.75rem !important;
+  /* 这里的背景颜色建议保持主题默认，或者微调成 VS Code Dark+ 的颜色 #1E1E1E */
+}
+
 .custom-md img, #post-cover img {
     @apply cursor-zoom-in
 }
@@ -149,4 +172,26 @@
         color: var(--codeblock-bg);
     }
   }
+}
+
+/* 专门为 Leo 设计的题目传送门样式 */
+.leo-portal-btn {
+  display: inline-flex !important;
+  align-items: center;
+  background: linear-gradient(to right, #2563eb, #4338ca) !important;
+  color: white !important;
+  padding: 12px 28px !important;
+  border-radius: 16px !important;
+  font-weight: bold !important;
+  text-decoration: none !important;
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+  transition: all 0.3s ease;
+  margin: 20px 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.leo-portal-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.4);
+  filter: brightness(1.1);
 }
