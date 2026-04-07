@@ -8,7 +8,7 @@ import type {
 import { LinkPreset } from "./types/config";
 
 export const siteConfig: SiteConfig = {
-	title: 'Leo 的算法空间',
+	title: 'LaiDuangduang 的算法空间',
 	subtitle: 'C++ 算法竞赛 & 学习记录', // 你的副标题
 	lang: 'zh-cn', // Language code, e.g. 'en', 'zh_CN', 'ja', etc.
 	displayStats: true,
@@ -50,7 +50,7 @@ export const navBarConfig: NavBarConfig = {
 
 export const profileConfig: ProfileConfig = {
 	avatar: 'assets/images/demo-avatar.png', // 以后换成你的键盘照片路径
-  	name: 'Leo',                            // 你的名字
+  	name: 'LaiDuangduang',                            // 你的名字
   	bio: '路虽远，行则将至。',                // 你的座右铭
 	links: [
 		{
