@@ -43,8 +43,8 @@ export const siteConfig: SiteConfig = {
 export const navBarConfig: NavBarConfig = {
 	links: [
     { name: '首页', url: '/' },       // 把 Home 改成 首页
-    { name: '归档', url: '/archive' }, // 把 Archive 改成 归档
-    { name: '关于', url: '/about' },   // 把 About 改成 关于
+    { name: '归档', url: '/archive/' }, // 把 Archive 改成 归档
+    { name: '关于', url: '/about/' },   // 把 About 改成 关于
   ],
 };
 
