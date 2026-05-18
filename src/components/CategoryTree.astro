@@ -1,0 +1,423 @@
+---
+import { Icon } from "astro-icon/components";
+import { categoryTree, ignoreTags } from "../categoryTree";
+import { getSortedPostsList } from "../utils/content-utils";
+import { getPostUrlBySlug, getTagUrl } from "../utils/url-utils";
+
+const posts = await getSortedPostsList();
+
+// 按发布日期倒序（getSortedPostsList 已经倒序）
+type PostBrief = {
+	slug: string;
+	title: string;
+	tags: string[];
+	publishedISO: string;
+	publishedLabel: string;
+};
+
+const formatDate = (d: Date) => {
+	const y = d.getFullYear();
+	const m = String(d.getMonth() + 1).padStart(2, "0");
+	const day = String(d.getDate()).padStart(2, "0");
+	return `${y}-${m}-${day}`;
+};
+
+const allPosts: PostBrief[] = posts.map((p) => ({
+	slug: p.slug,
+	title: p.data.title,
+	tags: (p.data.tags ?? []).map((t) => t.trim()),
+	publishedISO: new Date(p.data.published).toISOString(),
+	publishedLabel: formatDate(new Date(p.data.published)),
+}));
+
+// 收集所有用到的 tag
+const usedTags = new Set<string>();
+allPosts.forEach((p) => p.tags.forEach((t) => usedTags.add(t)));
+
+// 分类树渲染数据
+const tree = categoryTree.map((cat) => {
+	const knowledgePoints = cat.knowledgePoints.map((kp) => {
+		const matchedPosts = allPosts.filter((p) =>
+			p.tags.some((t) => kp.tags.includes(t)),
+		);
+		return {
+			name: kp.name,
+			tags: kp.tags,
+			posts: matchedPosts,
+		};
+	});
+	const totalPosts = new Set(
+		knowledgePoints.flatMap((kp) => kp.posts.map((p) => p.slug)),
+	).size;
+	return {
+		name: cat.name,
+		icon: cat.icon,
+		knowledgePoints,
+		totalPosts,
+	};
+});
+
+// 计算"未归类标签"：用过但没出现在任何 knowledgePoint 的 tag
+const classifiedTags = new Set<string>();
+categoryTree.forEach((cat) =>
+	cat.knowledgePoints.forEach((kp) =>
+		kp.tags.forEach((t) => classifiedTags.add(t)),
+	),
+);
+ignoreTags.forEach((t) => classifiedTags.add(t));
+
+const unclassifiedTags: { name: string; count: number }[] = [];
+usedTags.forEach((t) => {
+	if (!classifiedTags.has(t)) {
+		const count = allPosts.filter((p) => p.tags.includes(t)).length;
+		unclassifiedTags.push({ name: t, count });
+	}
+});
+unclassifiedTags.sort((a, b) => b.count - a.count);
+---
+
+<div class="category-tree card-base px-6 md:px-9 py-6 w-full">
+	<div class="flex items-center gap-3 mb-2">
+		<Icon
+			name="material-symbols:account-tree-outline"
+			class="text-[1.75rem] text-[var(--primary)]"
+		/>
+		<h1 class="text-3xl font-bold text-90">目录</h1>
+	</div>
+	<p class="text-neutral-500 dark:text-neutral-400 text-sm mb-6">
+		按知识点整理的题解和笔记，点击文章直接跳转。
+	</p>
+
+	{
+		tree.map((cat) => (
+			<details class="cat-block mb-3">
+				<summary class="cat-summary group">
+					<div class="flex items-center gap-3 flex-1 min-w-0">
+						<Icon
+							name="material-symbols:chevron-right"
+							class="cat-chevron text-[1.5rem] text-[var(--primary)] transition-transform shrink-0"
+						/>
+						{cat.icon && (
+							<Icon
+								name={cat.icon}
+								class="text-[1.4rem] text-[var(--primary)] shrink-0"
+							/>
+						)}
+						<span class="cat-name truncate">{cat.name}</span>
+					</div>
+					<span class="cat-count">{cat.totalPosts}</span>
+				</summary>
+
+				<div class="cat-body">
+					{cat.knowledgePoints.length === 0 && (
+						<div class="kp-empty">这里还没有知识点，等你以后填进来~</div>
+					)}
+
+					{cat.knowledgePoints.map((kp) => (
+						<details class="kp-block">
+							<summary class="kp-header">
+								<Icon
+									name="material-symbols:chevron-right"
+									class="kp-chevron text-[1.1rem] text-[var(--primary)] transition-transform shrink-0"
+								/>
+								<span class="kp-name">{kp.name}</span>
+								<span class="kp-count">{kp.posts.length}</span>
+								<a
+									href={getTagUrl(kp.tags[0] ?? kp.name)}
+									class="kp-tag-link"
+									title={`查看 #${kp.tags[0] ?? kp.name} 标签下的所有文章`}
+									onclick="event.stopPropagation()"
+								>
+									#
+								</a>
+							</summary>
+
+							{kp.posts.length === 0 ? (
+								<div class="kp-empty-line">（暂无文章）</div>
+							) : (
+								<ul class="post-list">
+									{kp.posts.map((post) => (
+										<li class="post-item">
+											<a
+												class="post-link"
+												href={getPostUrlBySlug(post.slug)}
+											>
+												<span class="post-title">{post.title}</span>
+												<time
+													class="post-date"
+													datetime={post.publishedISO}
+												>
+													{post.publishedLabel}
+												</time>
+											</a>
+										</li>
+									))}
+								</ul>
+							)}
+						</details>
+					))}
+				</div>
+			</details>
+		))
+	}
+
+	{
+		unclassifiedTags.length > 0 && (
+			<details class="cat-block mt-6 unclassified">
+				<summary class="cat-summary">
+					<div class="flex items-center gap-3 flex-1 min-w-0">
+						<Icon
+							name="material-symbols:chevron-right"
+							class="cat-chevron text-[1.5rem] text-amber-500 transition-transform shrink-0"
+						/>
+						<Icon
+							name="material-symbols:label-outline"
+							class="text-[1.4rem] text-amber-500 shrink-0"
+						/>
+						<span class="cat-name truncate">未归类标签</span>
+					</div>
+					<span class="cat-count">{unclassifiedTags.length}</span>
+				</summary>
+				<div class="cat-body">
+					<p class="text-sm text-neutral-500 dark:text-neutral-400 mb-2 px-1">
+						这些 tag 还没有被分到任何知识点。可以在
+						<code class="px-1 py-0.5 rounded bg-black/5 dark:bg-white/10">
+							src/categoryTree.ts
+						</code>
+						里把它们归到合适的位置。
+					</p>
+					<div class="flex flex-wrap gap-2">
+						{unclassifiedTags.map((t) => (
+							<a class="unclassified-tag" href={getTagUrl(t.name)}>
+								#{t.name}
+								<span class="unclassified-count">{t.count}</span>
+							</a>
+						))}
+					</div>
+				</div>
+			</details>
+		)
+	}
+</div>
+
+<style>
+	.cat-block {
+		border-radius: 0.75rem;
+		overflow: hidden;
+		background: rgba(0, 0, 0, 0.02);
+		border: 1px solid rgba(0, 0, 0, 0.05);
+	}
+	:global(.dark) .cat-block {
+		background: rgba(255, 255, 255, 0.03);
+		border-color: rgba(255, 255, 255, 0.06);
+	}
+
+	.cat-summary {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.65rem 0.9rem;
+		cursor: pointer;
+		list-style: none;
+		user-select: none;
+		font-weight: 600;
+		font-size: 1.05rem;
+		color: var(--deep-text, #222);
+		transition: background-color 0.15s ease;
+	}
+	:global(.dark) .cat-summary {
+		color: #e5e7eb;
+	}
+	.cat-summary::-webkit-details-marker {
+		display: none;
+	}
+	.cat-summary:hover {
+		background-color: rgba(0, 0, 0, 0.04);
+	}
+	:global(.dark) .cat-summary:hover {
+		background-color: rgba(255, 255, 255, 0.05);
+	}
+
+	.cat-name {
+		flex: 1;
+		min-width: 0;
+	}
+	.cat-count {
+		flex-shrink: 0;
+		min-width: 1.75rem;
+		text-align: center;
+		padding: 0 0.5rem;
+		height: 1.5rem;
+		line-height: 1.5rem;
+		font-size: 0.8rem;
+		border-radius: 999px;
+		background: var(--primary);
+		color: var(--card-bg, #fff);
+		font-weight: 600;
+	}
+
+	details[open] > .cat-summary > div > .cat-chevron {
+		transform: rotate(90deg);
+	}
+
+	.cat-body {
+		padding: 0.25rem 0.9rem 0.85rem;
+	}
+
+	.kp-block {
+		padding: 0.25rem 0;
+		border-top: 1px dashed rgba(0, 0, 0, 0.08);
+	}
+	:global(.dark) .kp-block {
+		border-top-color: rgba(255, 255, 255, 0.08);
+	}
+	.kp-block:first-child {
+		border-top: none;
+	}
+
+	.kp-header {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.35rem 0.25rem;
+		border-radius: 0.4rem;
+		cursor: pointer;
+		list-style: none;
+		user-select: none;
+		transition: background-color 0.15s ease;
+	}
+	.kp-header::-webkit-details-marker {
+		display: none;
+	}
+	.kp-header:hover {
+		background-color: rgba(0, 0, 0, 0.03);
+	}
+	:global(.dark) .kp-header:hover {
+		background-color: rgba(255, 255, 255, 0.04);
+	}
+	details.kp-block[open] > .kp-header > .kp-chevron {
+		transform: rotate(90deg);
+	}
+	.kp-name {
+		flex: 1;
+		min-width: 0;
+		font-weight: 600;
+		color: var(--primary);
+		font-size: 0.95rem;
+	}
+	.kp-count {
+		font-size: 0.75rem;
+		color: rgba(0, 0, 0, 0.45);
+	}
+	:global(.dark) .kp-count {
+		color: rgba(255, 255, 255, 0.5);
+	}
+	.kp-tag-link {
+		flex-shrink: 0;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.4rem;
+		height: 1.4rem;
+		border-radius: 0.35rem;
+		font-size: 0.85rem;
+		color: rgba(0, 0, 0, 0.4);
+		text-decoration: none;
+		transition: all 0.15s ease;
+	}
+	.kp-tag-link:hover {
+		background-color: rgba(var(--primary-rgb, 124, 58, 237), 0.12);
+		color: var(--primary);
+	}
+	:global(.dark) .kp-tag-link {
+		color: rgba(255, 255, 255, 0.4);
+	}
+
+	.kp-empty,
+	.kp-empty-line {
+		color: rgba(0, 0, 0, 0.4);
+		font-size: 0.85rem;
+		padding: 0.25rem 0.25rem;
+	}
+	:global(.dark) .kp-empty,
+	:global(.dark) .kp-empty-line {
+		color: rgba(255, 255, 255, 0.4);
+	}
+
+	.post-list {
+		list-style: none;
+		padding-left: 0.75rem;
+		margin: 0.25rem 0 0;
+		border-left: 2px solid rgba(var(--primary-rgb, 124, 58, 237), 0.25);
+	}
+	.post-item + .post-item {
+		margin-top: 0.15rem;
+	}
+	.post-link {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 0.35rem 0.5rem;
+		border-radius: 0.4rem;
+		text-decoration: none;
+		color: inherit;
+		transition: background-color 0.15s ease;
+	}
+	.post-link:hover {
+		background-color: rgba(0, 0, 0, 0.04);
+	}
+	:global(.dark) .post-link:hover {
+		background-color: rgba(255, 255, 255, 0.05);
+	}
+	.post-title {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: 0.95rem;
+	}
+	.post-link:hover .post-title {
+		color: var(--primary);
+	}
+	.post-date {
+		flex-shrink: 0;
+		font-size: 0.8rem;
+		color: rgba(0, 0, 0, 0.45);
+		font-variant-numeric: tabular-nums;
+	}
+	:global(.dark) .post-date {
+		color: rgba(255, 255, 255, 0.45);
+	}
+
+	.unclassified .cat-summary {
+		color: #b45309;
+	}
+	:global(.dark) .unclassified .cat-summary {
+		color: #fbbf24;
+	}
+	.unclassified-tag {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.2rem 0.6rem;
+		border-radius: 999px;
+		background: rgba(245, 158, 11, 0.12);
+		color: #b45309;
+		font-size: 0.85rem;
+		text-decoration: none;
+		transition: background-color 0.15s ease;
+	}
+	.unclassified-tag:hover {
+		background-color: rgba(245, 158, 11, 0.22);
+	}
+	:global(.dark) .unclassified-tag {
+		background: rgba(251, 191, 36, 0.12);
+		color: #fbbf24;
+	}
+	.unclassified-count {
+		font-size: 0.7rem;
+		opacity: 0.7;
+	}
+</style>
