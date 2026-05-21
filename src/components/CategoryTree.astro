@@ -1,8 +1,15 @@
 ---
 import { Icon } from "astro-icon/components";
-import { categoryTree, ignoreTags } from "../categoryTree";
+import {
+	type KnowledgePoint,
+	categoryTree,
+	ignoreTags,
+} from "../categoryTree";
 import { getSortedPostsList } from "../utils/content-utils";
-import { getPostUrlBySlug, getTagUrl } from "../utils/url-utils";
+import { getTagUrl } from "../utils/url-utils";
+import KnowledgePointNode, {
+	type KPNode,
+} from "./KnowledgePointNode.astro";
 
 const posts = await getSortedPostsList();
 
@@ -34,36 +41,65 @@ const allPosts: PostBrief[] = posts.map((p) => ({
 const usedTags = new Set<string>();
 allPosts.forEach((p) => p.tags.forEach((t) => usedTags.add(t)));
 
+// 把一个 KnowledgePoint 配置（可能含 children）递归构造成可渲染节点
+// totalCount = 自己直接命中的文章数 + 所有子孙命中的文章数（按 slug 去重）
+function buildKPNode(kp: KnowledgePoint): KPNode {
+	const matchedPosts = allPosts
+		.filter((p) => p.tags.some((t) => kp.tags.includes(t)))
+		.map(
+			(p) =>
+				({
+					slug: p.slug,
+					title: p.title,
+					publishedISO: p.publishedISO,
+					publishedLabel: p.publishedLabel,
+				}) satisfies KPNode["posts"][number],
+		);
+	const children = (kp.children ?? []).map(buildKPNode);
+
+	const slugSet = new Set<string>(matchedPosts.map((p) => p.slug));
+	children.forEach((c) =>
+		// 子孙的 totalCount 已经聚合好，但我们要的是「去重后的 slug 集合」，
+		// 所以收集所有子孙的实际 post slug。
+		collectSlugs(c, slugSet),
+	);
+
+	return {
+		name: kp.name,
+		tags: kp.tags,
+		posts: matchedPosts,
+		children,
+		totalCount: slugSet.size,
+	};
+}
+
+function collectSlugs(node: KPNode, into: Set<string>) {
+	node.posts.forEach((p) => into.add(p.slug));
+	node.children.forEach((c) => collectSlugs(c, into));
+}
+
 // 分类树渲染数据
 const tree = categoryTree.map((cat) => {
-	const knowledgePoints = cat.knowledgePoints.map((kp) => {
-		const matchedPosts = allPosts.filter((p) =>
-			p.tags.some((t) => kp.tags.includes(t)),
-		);
-		return {
-			name: kp.name,
-			tags: kp.tags,
-			posts: matchedPosts,
-		};
-	});
-	const totalPosts = new Set(
-		knowledgePoints.flatMap((kp) => kp.posts.map((p) => p.slug)),
-	).size;
+	const knowledgePoints = cat.knowledgePoints.map(buildKPNode);
+	const slugSet = new Set<string>();
+	knowledgePoints.forEach((n) => collectSlugs(n, slugSet));
 	return {
 		name: cat.name,
 		icon: cat.icon,
 		knowledgePoints,
-		totalPosts,
+		totalPosts: slugSet.size,
 	};
 });
 
-// 计算"未归类标签"：用过但没出现在任何 knowledgePoint 的 tag
+// 计算"未归类标签"：用过但没出现在任何 knowledgePoint（含子孙）里的 tag
 const classifiedTags = new Set<string>();
-categoryTree.forEach((cat) =>
-	cat.knowledgePoints.forEach((kp) =>
-		kp.tags.forEach((t) => classifiedTags.add(t)),
-	),
-);
+function collectTags(kps: KnowledgePoint[]) {
+	kps.forEach((kp) => {
+		kp.tags.forEach((t) => classifiedTags.add(t));
+		if (kp.children) collectTags(kp.children);
+	});
+}
+categoryTree.forEach((cat) => collectTags(cat.knowledgePoints));
 ignoreTags.forEach((t) => classifiedTags.add(t));
 
 const unclassifiedTags: { name: string; count: number }[] = [];
@@ -114,47 +150,7 @@ unclassifiedTags.sort((a, b) => b.count - a.count);
 					)}
 
 					{cat.knowledgePoints.map((kp) => (
-						<details class="kp-block">
-							<summary class="kp-header">
-								<Icon
-									name="material-symbols:chevron-right"
-									class="kp-chevron text-[1.1rem] text-[var(--primary)] transition-transform shrink-0"
-								/>
-								<span class="kp-name">{kp.name}</span>
-								<span class="kp-count">{kp.posts.length}</span>
-								<a
-									href={getTagUrl(kp.tags[0] ?? kp.name)}
-									class="kp-tag-link"
-									title={`查看 #${kp.tags[0] ?? kp.name} 标签下的所有文章`}
-									onclick="event.stopPropagation()"
-								>
-									#
-								</a>
-							</summary>
-
-							{kp.posts.length === 0 ? (
-								<div class="kp-empty-line">（暂无文章）</div>
-							) : (
-								<ul class="post-list">
-									{kp.posts.map((post) => (
-										<li class="post-item">
-											<a
-												class="post-link"
-												href={getPostUrlBySlug(post.slug)}
-											>
-												<span class="post-title">{post.title}</span>
-												<time
-													class="post-date"
-													datetime={post.publishedISO}
-												>
-													{post.publishedLabel}
-												</time>
-											</a>
-										</li>
-									))}
-								</ul>
-							)}
-						</details>
+						<KnowledgePointNode node={kp} />
 					))}
 				</div>
 			</details>

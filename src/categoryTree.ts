@@ -13,9 +13,20 @@
 //     tags 写文章 frontmatter 里 tags 字段的值，
 //     一个文章命中任一 tag 就会出现在这个知识点下面。
 //
-//  3. 一个文章可以同时属于多个知识点（只要 tag 匹配就行）。
+//  3. 知识点可以嵌套子知识点（任意层数），比如：
+//        {
+//          name: "计数 DP",
+//          tags: ["计数DP"],
+//          children: [
+//            { name: "子序列计数 DP", tags: ["子序列计数DP"] },
+//            { name: "区间计数 DP",   tags: ["区间计数DP"] },
+//          ],
+//        }
+//     父节点会自动汇总所有子孙节点的题数。
 //
-//  4. ignoreTags 里的 tag 不会触发「未分类」提醒
+//  4. 一个文章可以同时属于多个知识点（只要 tag 匹配就行）。
+//
+//  5. ignoreTags 里的 tag 不会触发「未分类」提醒
 //     （比如 C++ 这种全文章都打的语言标签）。
 //
 //  没匹配到任何知识点的 tag 会自动汇总到目录页底部
@@ -35,8 +46,9 @@
 // =============================================================
 
 export interface KnowledgePoint {
-	name: string;     // 知识点显示名
-	tags: string[];   // 命中任一 tag 就算这个知识点下的文章
+	name: string;                  // 知识点显示名
+	tags: string[];                // 命中任一 tag 就算这个知识点下的文章
+	children?: KnowledgePoint[];   // 可选：再细分的子知识点，可无限嵌套
 }
 
 export interface TopCategory {
@@ -58,8 +70,17 @@ export const categoryTree: TopCategory[] = [
 		icon: "material-symbols:auto-graph",
 		knowledgePoints: [
 			{ name: "值域 DP", tags: ["值域dp"] },
-			{ name: "树形 DP / 树上背包", tags: ["树形DP", "树上背包"] },
-			{ name: "通用 DP", tags: ["动态规划"] },
+			{ name: "树形 DP", tags: ["树形DP", "树上背包"] },
+			{ name: "线性 DP", tags: ["线性DP"] },
+			{
+				name: "计数 DP",
+				tags: ["计数DP"],
+				children: [
+					// 想在「计数 DP」里再开一个子展开列表，就这样写：
+					{ name: "子序列计数 DP", tags: ["子序列计数DP"] },
+					// 想再细分？直接在上面那行的 `}` 前面加 children: [...]，无限嵌套
+				],
+			},
 		],
 	},
 	{
@@ -68,6 +89,7 @@ export const categoryTree: TopCategory[] = [
 		knowledgePoints: [
 			{ name: "优先队列 / 延迟操作", tags: ["优先队列", "延迟更新", "懒"] },
 			{ name: "数组链表 / 双向链表", tags: ["双向链表"] },
+			{name :"维护第k大", tags: ['维护第k大']},
 		],
 	},
 	{

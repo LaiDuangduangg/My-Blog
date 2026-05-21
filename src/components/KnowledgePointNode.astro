@@ -1,0 +1,215 @@
+---
+import { Icon } from "astro-icon/components";
+import { getPostUrlBySlug, getTagUrl } from "../utils/url-utils";
+import Self from "./KnowledgePointNode.astro";
+
+type PostBrief = {
+	slug: string;
+	title: string;
+	publishedISO: string;
+	publishedLabel: string;
+};
+
+export type KPNode = {
+	name: string;
+	tags: string[];
+	posts: PostBrief[];
+	children: KPNode[];
+	totalCount: number;
+};
+
+interface Props {
+	node: KPNode;
+}
+
+const { node } = Astro.props;
+const hasChildren = node.children.length > 0;
+const hasPosts = node.posts.length > 0;
+const tagForLink = node.tags[0] ?? node.name;
+---
+
+<details class="kp-block">
+	<summary class="kp-header">
+		<Icon
+			name="material-symbols:chevron-right"
+			class="kp-chevron text-[1.1rem] text-[var(--primary)] transition-transform shrink-0"
+		/>
+		<span class="kp-name">{node.name}</span>
+		<span class="kp-count">{node.totalCount}</span>
+		<a
+			href={getTagUrl(tagForLink)}
+			class="kp-tag-link"
+			title={`查看 #${tagForLink} 标签下的所有文章`}
+			onclick="event.stopPropagation()"
+		>
+			#
+		</a>
+	</summary>
+
+	<div class="kp-body">
+		{!hasPosts && !hasChildren && (
+			<div class="kp-empty-line">（暂无文章）</div>
+		)}
+
+		{hasPosts && (
+			<ul class="post-list">
+				{node.posts.map((post) => (
+					<li class="post-item">
+						<a class="post-link" href={getPostUrlBySlug(post.slug)}>
+							<span class="post-title">{post.title}</span>
+							<time class="post-date" datetime={post.publishedISO}>
+								{post.publishedLabel}
+							</time>
+						</a>
+					</li>
+				))}
+			</ul>
+		)}
+
+		{hasChildren && (
+			<div class="kp-children">
+				{node.children.map((child) => (
+					<Self node={child} />
+				))}
+			</div>
+		)}
+	</div>
+</details>
+
+<style>
+	.kp-block {
+		padding: 0.25rem 0;
+		border-top: 1px dashed rgba(0, 0, 0, 0.08);
+	}
+	:global(.dark) .kp-block {
+		border-top-color: rgba(255, 255, 255, 0.08);
+	}
+	.kp-block:first-child {
+		border-top: none;
+	}
+
+	.kp-header {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.35rem 0.25rem;
+		border-radius: 0.4rem;
+		cursor: pointer;
+		list-style: none;
+		user-select: none;
+		transition: background-color 0.15s ease;
+	}
+	.kp-header::-webkit-details-marker {
+		display: none;
+	}
+	.kp-header:hover {
+		background-color: rgba(0, 0, 0, 0.03);
+	}
+	:global(.dark) .kp-header:hover {
+		background-color: rgba(255, 255, 255, 0.04);
+	}
+	details.kp-block[open] > .kp-header > .kp-chevron {
+		transform: rotate(90deg);
+	}
+	.kp-name {
+		flex: 1;
+		min-width: 0;
+		font-weight: 600;
+		color: var(--primary);
+		font-size: 0.95rem;
+	}
+	.kp-count {
+		font-size: 0.75rem;
+		color: rgba(0, 0, 0, 0.45);
+	}
+	:global(.dark) .kp-count {
+		color: rgba(255, 255, 255, 0.5);
+	}
+	.kp-tag-link {
+		flex-shrink: 0;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.4rem;
+		height: 1.4rem;
+		border-radius: 0.35rem;
+		font-size: 0.85rem;
+		color: rgba(0, 0, 0, 0.4);
+		text-decoration: none;
+		transition: all 0.15s ease;
+	}
+	.kp-tag-link:hover {
+		background-color: rgba(var(--primary-rgb, 124, 58, 237), 0.12);
+		color: var(--primary);
+	}
+	:global(.dark) .kp-tag-link {
+		color: rgba(255, 255, 255, 0.4);
+	}
+
+	.kp-body {
+		padding-left: 0.25rem;
+	}
+
+	.kp-empty-line {
+		color: rgba(0, 0, 0, 0.4);
+		font-size: 0.85rem;
+		padding: 0.25rem 0.25rem 0.25rem 1.5rem;
+	}
+	:global(.dark) .kp-empty-line {
+		color: rgba(255, 255, 255, 0.4);
+	}
+
+	/* 嵌套子知识点的容器 */
+	.kp-children {
+		margin: 0.2rem 0 0.1rem 1rem;
+		padding-left: 0.6rem;
+		border-left: 1px dashed rgba(var(--primary-rgb, 124, 58, 237), 0.25);
+	}
+
+	.post-list {
+		list-style: none;
+		padding-left: 0.75rem;
+		margin: 0.25rem 0 0 1.4rem;
+		border-left: 2px solid rgba(var(--primary-rgb, 124, 58, 237), 0.25);
+	}
+	.post-item + .post-item {
+		margin-top: 0.15rem;
+	}
+	.post-link {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 0.35rem 0.5rem;
+		border-radius: 0.4rem;
+		text-decoration: none;
+		color: inherit;
+		transition: background-color 0.15s ease;
+	}
+	.post-link:hover {
+		background-color: rgba(0, 0, 0, 0.04);
+	}
+	:global(.dark) .post-link:hover {
+		background-color: rgba(255, 255, 255, 0.05);
+	}
+	.post-title {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: 0.95rem;
+	}
+	.post-link:hover .post-title {
+		color: var(--primary);
+	}
+	.post-date {
+		flex-shrink: 0;
+		font-size: 0.8rem;
+		color: rgba(0, 0, 0, 0.45);
+		font-variant-numeric: tabular-nums;
+	}
+	:global(.dark) .post-date {
+		color: rgba(255, 255, 255, 0.45);
+	}
+</style>
