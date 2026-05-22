@@ -104,7 +104,7 @@ export const categoryTree: TopCategory[] = [
 		icon: "material-symbols:calculate-outline",
 		knowledgePoints: [
 			{ name: "快速幂", tags: ["快速幂"] },
-			{ name: "数论 / 数学推导", tags: ["数论", "数学推导"] },
+			{ name: "组合数学", tags: ["组合数学"]},
 			{ name: "公式变换 / 容斥", tags: ["公式变换", "斥容原理"] },
 		],
 	},
