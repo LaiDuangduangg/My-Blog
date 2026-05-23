@@ -62,7 +62,17 @@ export const categoryTree: TopCategory[] = [
 		name: "图论",
 		icon: "material-symbols:hub-outline",
 		knowledgePoints: [
-			{ name: "LCA / 倍增", tags: ["LCA", "倍增", "图论"] },
+			{ name: "树上问题", tags: ["LCA", "树形图"] },
+			{ 
+				name: "BFS",
+				tags: ["BFS"],
+				children: [
+					{name : "01BFS", tags: ["01BFS"]},
+					{name : "状态扩展BFS", tags: ["状态扩展BFS"]},
+				],
+			},
+			{ name: "Dijkstra", tags: ["Dijkstra"]},
+
 		],
 	},
 	{
@@ -87,8 +97,8 @@ export const categoryTree: TopCategory[] = [
 		name: "数据结构",
 		icon: "material-symbols:account-tree-outline",
 		knowledgePoints: [
-			{ name: "优先队列 / 延迟操作", tags: ["优先队列", "延迟更新", "懒"] },
-			{ name: "数组链表 / 双向链表", tags: ["双向链表"] },
+			{ name: "延迟操作", tags: ["优先队列", "延迟更新", "懒"] },
+			{ name: "双向链表", tags: ["双向链表"] },
 			{name :"维护第k大", tags: ['维护第k大']},
 		],
 	},
@@ -100,11 +110,10 @@ export const categoryTree: TopCategory[] = [
 		],
 	},
 	{
-		name: "数论 / 数学",
+		name: "数论",
 		icon: "material-symbols:calculate-outline",
 		knowledgePoints: [
 			{ name: "快速幂", tags: ["快速幂"] },
-			{ name: "组合数学", tags: ["组合数学"]},
 			{ name: "公式变换 / 容斥", tags: ["公式变换", "斥容原理"] },
 		],
 	},
@@ -124,6 +133,13 @@ export const categoryTree: TopCategory[] = [
 		],
 	},
 	{
+		name: "构造",
+		icon: "material-symbols:construction",
+		knowledgePoints: [
+			{ name: "构造", tags: ["构造"] },
+		],
+	},
+	{
 		name: "二分",
 		icon: "material-symbols:swap-horiz",
 		knowledgePoints: [
@@ -135,6 +151,7 @@ export const categoryTree: TopCategory[] = [
 		icon: "material-symbols:dataset-outline",
 		knowledgePoints: [
 			// 以后写到组合数学相关的题再补
+			{name : "隔板法/插板法", tags: ["隔板法", "插板法"]},
 		],
 	},
 	{
