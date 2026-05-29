@@ -188,11 +188,29 @@ top-20 left-4 md:left-[unset] right-4 shadow-2xl rounded-2xl p-2">
 </div>
 
 <style>
+  #search-bar {
+    box-shadow: inset 0 0 0 1px transparent;
+  }
+
+  #search-bar:focus-within {
+    box-shadow:
+      inset 0 0 0 1px color-mix(in oklch, var(--primary) 32%, transparent),
+      0 8px 22px color-mix(in oklch, var(--primary) 12%, transparent);
+    transform: translateY(-1px);
+  }
+
+  #search-bar:focus-within :global(svg) {
+    color: var(--primary);
+    transform: translateX(1px);
+  }
+
   input:focus {
     outline: 0;
   }
   .search-panel {
     max-height: calc(100vh - 100px);
     overflow-y: auto;
+    backdrop-filter: blur(18px) saturate(1.12);
+    border: 1px solid color-mix(in oklch, var(--primary) 14%, transparent);
   }
 </style>

@@ -20,8 +20,8 @@
     }
 
     a:not(.no-styling) {
-        @apply relative bg-none link font-medium text-[var(--primary)]
-        underline decoration-[var(--link-underline)] decoration-1 decoration-dashed underline-offset-4;
+        @apply relative bg-none rounded-md p-1 -m-1 font-medium text-[var(--primary)]
+        underline decoration-[var(--link-underline)] decoration-1 decoration-dashed underline-offset-4 transition;
         box-decoration-break: clone;
         -webkit-box-decoration-break: clone;
         display: inline-block;
@@ -62,9 +62,15 @@
     .copy-btn {
         all: initial;
         @apply btn-regular-dark opacity-0 shadow-lg shadow-black/50 absolute active:scale-90 h-8 w-8 top-3 right-3 text-sm rounded-lg transition-all ease-in-out z-20 cursor-pointer;
+        transform: translateY(-0.25rem) scale(0.96);
+        box-shadow:
+            0 8px 18px rgba(0, 0, 0, 0.28),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.09);
     }
     .frame:hover .copy-btn {
         opacity: 1;
+        transform: translateY(0) scale(1);
+        backdrop-filter: blur(10px);
     }
 
     .copy-btn-icon {
@@ -85,8 +91,52 @@
 
     .expressive-code {
         @apply my-4;
+        contain: layout paint style;
         ::selection {
             @apply bg-[var(--codeblock-selection)];
+        }
+
+        .frame {
+            position: relative;
+            overflow: hidden;
+            contain: layout paint style;
+            border: 1px solid color-mix(in oklch, var(--primary) 16%, transparent);
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.1);
+        }
+
+        .frame::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto;
+            z-index: 3;
+            height: 2px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                color-mix(in oklch, var(--primary) 75%, white),
+                transparent
+            );
+            opacity: 0.78;
+            pointer-events: none;
+        }
+
+        .frame::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(
+                    circle at top right,
+                    color-mix(in oklch, var(--primary) 6%, transparent),
+                    transparent 34%
+                );
+            opacity: 0;
+            transition: opacity 180ms ease;
+        }
+
+        .frame:hover::after {
+            opacity: 1;
         }
     }
 
@@ -112,10 +162,18 @@
 
     }
 
+    .katex-display,
     .katex-display-container {
         max-width: 100%;
         overflow-x: auto;
         margin: 1em 0;
+        contain: layout paint style;
+        scrollbar-gutter: stable;
+    }
+
+    .katex-display > .katex {
+        display: inline-block;
+        min-width: max-content;
     }
     
 }

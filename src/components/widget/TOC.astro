@@ -71,6 +71,8 @@ class TableOfContents extends HTMLElement {
     tocEntries: HTMLAnchorElement[] = [];
     active: boolean[] = [];
     activeIndicator: HTMLElement | null = null;
+    updateTicking = false;
+    lastScrollTarget = -1;
 
     constructor() {
         super();
@@ -144,15 +146,21 @@ class TableOfContents extends HTMLElement {
         else
             top = bottommost.offsetTop - tocHeight * 0.8;
 
+        if (Math.abs(top - this.lastScrollTarget) < 12) return;
+        this.lastScrollTarget = top;
+
         this.tocEl.scrollTo({
             top,
             left: 0,
-            behavior: "smooth",
+            behavior: "auto",
         });
     };
 
     update = () => {
+        if (this.updateTicking) return;
+        this.updateTicking = true;
         requestAnimationFrame(() => {
+            this.updateTicking = false;
             this.toggleActiveHeading();
             // requestAnimationFrame(() => {
             this.scrollToActiveHeading();

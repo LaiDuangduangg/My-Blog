@@ -6,9 +6,9 @@ import ImageWrapper from "../misc/ImageWrapper.astro";
 
 const config = profileConfig;
 ---
-<div class="card-base p-3">
+<div class="profile-card card-base p-3">
     <a aria-label="Go to About Page" href={url('/about/')}
-       class="group block relative mx-auto mt-1 lg:mx-0 lg:mt-0 mb-3
+       class="profile-avatar group block relative mx-auto mt-1 lg:mx-0 lg:mt-0 mb-3
        max-w-[12rem] lg:max-w-none overflow-hidden rounded-xl active:scale-95">
         <div class="absolute transition pointer-events-none group-hover:bg-black/30 group-active:bg-black/50
         w-full h-full z-50 flex items-center justify-center">
@@ -36,4 +36,98 @@ const config = profileConfig;
         </div>
     </div>
 </div>
+
+<style>
+	.profile-card {
+		position: relative;
+		isolation: isolate;
+	}
+
+	.profile-card::before {
+		content: "";
+		position: absolute;
+		inset: 0.55rem;
+		z-index: -1;
+		border-radius: 1rem;
+		background:
+			radial-gradient(
+				circle at 30% 0%,
+				color-mix(in oklch, var(--primary) 18%, transparent),
+				transparent 42%
+			);
+		filter: blur(18px);
+		opacity: 0.45;
+		transition: opacity 220ms ease;
+	}
+
+	.profile-card:hover::before {
+		opacity: 0.78;
+	}
+
+	.profile-avatar {
+		box-shadow:
+			0 0 0 2px color-mix(in oklch, var(--primary) 18%, transparent),
+			0 14px 34px rgba(0, 0, 0, 0.08);
+		transition:
+			transform 220ms ease,
+			box-shadow 220ms ease;
+	}
+
+	.profile-avatar::before {
+		content: "";
+		position: absolute;
+		inset: -45%;
+		z-index: 1;
+		pointer-events: none;
+		background: conic-gradient(
+			from 0deg,
+			transparent,
+			color-mix(in oklch, var(--primary) 45%, white),
+			transparent 28%
+		);
+		opacity: 0;
+		transition: opacity 220ms ease;
+	}
+
+	.profile-avatar::after {
+		content: "";
+		position: absolute;
+		inset: 2px;
+		z-index: 2;
+		pointer-events: none;
+		border-radius: 0.65rem;
+		border: 1px solid rgba(255, 255, 255, 0.45);
+	}
+
+	.profile-avatar:hover {
+		transform: translateY(-2px) scale(1.012);
+		box-shadow:
+			0 0 0 2px color-mix(in oklch, var(--primary) 32%, transparent),
+			0 18px 42px rgba(0, 0, 0, 0.13);
+	}
+
+	.profile-avatar:hover::before {
+		opacity: 0.35;
+		animation: profile-glow-spin 5.5s linear infinite;
+	}
+
+	@keyframes profile-glow-spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.profile-card::before,
+		.profile-avatar,
+		.profile-avatar::before {
+			animation: none;
+			transition: none;
+		}
+
+		.profile-avatar:hover {
+			transform: none;
+		}
+	}
+</style>
 

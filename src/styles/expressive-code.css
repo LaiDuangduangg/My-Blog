@@ -1,9 +1,28 @@
 .expressive-code {
     .frame {
         @apply !shadow-none;
+        transition:
+            border-color 180ms ease,
+            box-shadow 180ms ease,
+            transform 180ms ease;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+    .frame:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.13) !important;
+    }
     }
 
     .title {
         font-family: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .expressive-code .frame,
+    .expressive-code .frame:hover {
+        transition: none;
+        transform: none;
     }
 }

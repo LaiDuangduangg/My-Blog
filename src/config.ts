@@ -13,7 +13,7 @@ export const siteConfig: SiteConfig = {
 	lang: 'zh-cn', // Language code, e.g. 'en', 'zh_CN', 'ja', etc.
 	displayStats: true,
 	themeColor: {
-		hue: 250, // Default hue for the theme color, from 0 to 360. e.g. red: 0, teal: 200, cyan: 250, pink: 345
+		hue: 25, // Default hue for the theme color, from 0 to 360. e.g. red: 0, teal: 200, cyan: 250, pink: 345
 		fixed: false, // Hide the theme color picker for visitors
 	},
 	banner: {
@@ -50,7 +50,7 @@ export const navBarConfig: NavBarConfig = {
 };
 
 export const profileConfig: ProfileConfig = {
-	avatar: 'assets/images/demo-avatar.png', // 以后换成你的键盘照片路径
+	avatar: '/images/头像.jpg',
   	name: 'LaiDuangduang',                            // 你的名字
   	bio: '路虽远，行则将至。',                // 你的座右铭
 	links: [

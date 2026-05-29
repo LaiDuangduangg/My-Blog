@@ -202,10 +202,23 @@ unclassifiedTags.sort((a, b) => b.count - a.count);
 		overflow: hidden;
 		background: rgba(0, 0, 0, 0.02);
 		border: 1px solid rgba(0, 0, 0, 0.05);
+		transition:
+			transform 180ms ease,
+			border-color 180ms ease,
+			box-shadow 180ms ease,
+			background-color 180ms ease;
 	}
 	:global(.dark) .cat-block {
 		background: rgba(255, 255, 255, 0.03);
 		border-color: rgba(255, 255, 255, 0.06);
+	}
+	.cat-block:hover {
+		transform: translateY(-1px);
+		border-color: color-mix(in oklch, var(--primary) 25%, transparent);
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.045);
+	}
+	:global(.dark) .cat-block:hover {
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
 	}
 
 	.cat-summary {
@@ -219,7 +232,9 @@ unclassifiedTags.sort((a, b) => b.count - a.count);
 		font-weight: 600;
 		font-size: 1.05rem;
 		color: var(--deep-text, #222);
-		transition: background-color 0.15s ease;
+		transition:
+			background-color 0.15s ease,
+			color 0.15s ease;
 	}
 	:global(.dark) .cat-summary {
 		color: #e5e7eb;
@@ -228,10 +243,20 @@ unclassifiedTags.sort((a, b) => b.count - a.count);
 		display: none;
 	}
 	.cat-summary:hover {
-		background-color: rgba(0, 0, 0, 0.04);
+		background:
+			linear-gradient(
+				90deg,
+				color-mix(in oklch, var(--primary) 8%, transparent),
+				rgba(0, 0, 0, 0.025)
+			);
 	}
 	:global(.dark) .cat-summary:hover {
-		background-color: rgba(255, 255, 255, 0.05);
+		background:
+			linear-gradient(
+				90deg,
+				color-mix(in oklch, var(--primary) 11%, transparent),
+				rgba(255, 255, 255, 0.035)
+			);
 	}
 
 	.cat-name {
@@ -250,6 +275,13 @@ unclassifiedTags.sort((a, b) => b.count - a.count);
 		background: var(--primary);
 		color: var(--card-bg, #fff);
 		font-weight: 600;
+		transition:
+			transform 180ms ease,
+			box-shadow 180ms ease;
+	}
+	.cat-block:hover .cat-count {
+		transform: scale(1.05);
+		box-shadow: 0 6px 16px color-mix(in oklch, var(--primary) 28%, transparent);
 	}
 
 	details[open] > .cat-summary > div > .cat-chevron {
@@ -258,6 +290,7 @@ unclassifiedTags.sort((a, b) => b.count - a.count);
 
 	.cat-body {
 		padding: 0.25rem 0.9rem 0.85rem;
+		animation: category-body-in 180ms ease;
 	}
 
 	.kp-block {
@@ -280,13 +313,16 @@ unclassifiedTags.sort((a, b) => b.count - a.count);
 		cursor: pointer;
 		list-style: none;
 		user-select: none;
-		transition: background-color 0.15s ease;
+		transition:
+			background-color 0.15s ease,
+			transform 0.15s ease;
 	}
 	.kp-header::-webkit-details-marker {
 		display: none;
 	}
 	.kp-header:hover {
 		background-color: rgba(0, 0, 0, 0.03);
+		transform: translateX(2px);
 	}
 	:global(.dark) .kp-header:hover {
 		background-color: rgba(255, 255, 255, 0.04);
@@ -324,6 +360,7 @@ unclassifiedTags.sort((a, b) => b.count - a.count);
 	.kp-tag-link:hover {
 		background-color: rgba(var(--primary-rgb, 124, 58, 237), 0.12);
 		color: var(--primary);
+		transform: translateY(-1px);
 	}
 	:global(.dark) .kp-tag-link {
 		color: rgba(255, 255, 255, 0.4);
@@ -358,10 +395,13 @@ unclassifiedTags.sort((a, b) => b.count - a.count);
 		border-radius: 0.4rem;
 		text-decoration: none;
 		color: inherit;
-		transition: background-color 0.15s ease;
+		transition:
+			background-color 0.15s ease,
+			transform 0.15s ease;
 	}
 	.post-link:hover {
 		background-color: rgba(0, 0, 0, 0.04);
+		transform: translateX(2px);
 	}
 	:global(.dark) .post-link:hover {
 		background-color: rgba(255, 255, 255, 0.05);
@@ -415,5 +455,36 @@ unclassifiedTags.sort((a, b) => b.count - a.count);
 	.unclassified-count {
 		font-size: 0.7rem;
 		opacity: 0.7;
+	}
+
+	@keyframes category-body-in {
+		from {
+			opacity: 0;
+			transform: translateY(-0.35rem);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.cat-block,
+		.cat-count,
+		.cat-body,
+		.kp-header,
+		.kp-tag-link,
+		.post-link {
+			animation: none;
+			transition: none;
+		}
+
+		.cat-block:hover,
+		.cat-block:hover .cat-count,
+		.kp-header:hover,
+		.kp-tag-link:hover,
+		.post-link:hover {
+			transform: none;
+		}
 	}
 </style>
