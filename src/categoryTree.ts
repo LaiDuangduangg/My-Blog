@@ -82,7 +82,13 @@ export const categoryTree: TopCategory[] = [
 		knowledgePoints: [
 			{ name: "值域 DP", tags: ["值域dp"] },
 			{ name: "树形 DP", tags: ["树形DP", "树上背包"] },
-			{ name: "线性 DP", tags: ["线性DP"] },
+			{ 	name: "线性 DP",
+				tags: ["线性DP"],
+				children: [
+					{name: " 分段DP", tags: ["分段DP","一维选址DP"]},
+				]
+				
+			},
 			{
 				name: "计数 DP",
 				tags: ["计数DP"],
@@ -91,7 +97,9 @@ export const categoryTree: TopCategory[] = [
 					{ name: "子序列计数 DP", tags: ["子序列计数DP"] },
 					// 想再细分？直接在上面那行的 `}` 前面加 children: [...]，无限嵌套
 				],
+				
 			},
+			
 		],
 	},
 	{
