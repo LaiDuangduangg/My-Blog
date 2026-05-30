@@ -69,7 +69,7 @@ export const categoryTree: TopCategory[] = [
 				children: [
 					{name : "01BFS", tags: ["01BFS"]},
 					{name : "状态扩展BFS", tags: ["状态扩展BFS"]},
-					{name : "普通BFS", tags : ["BFS"]},
+					{name : "普通BFS", tags : ["普通BFS"]},
 				],
 			},
 			{ name: "Dijkstra", tags: ["Dijkstra"]},
