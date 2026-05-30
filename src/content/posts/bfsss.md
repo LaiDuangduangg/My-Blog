@@ -2,7 +2,7 @@
 title: Repeatedly Repainting(1.0)
 published: 2026-05-31
 category: 算法竞赛
-tags: [C++, BFS]
+tags: [C++, 普通BFS]
 ---
 
 ## 题目描述
