@@ -203,8 +203,7 @@ $: if (initialized && commandOpen) {
 	class="hidden lg:flex command-trigger transition-all items-center h-11 mr-2 rounded-lg"
 >
 	<Icon icon="material-symbols:manage-search-rounded" class="text-[1.25rem]" />
-	<span>搜索 / 命令</span>
-	<kbd>Ctrl K</kbd>
+	<span>搜索文章...</span>
 </button>
 
 <button
@@ -285,36 +284,27 @@ $: if (initialized && commandOpen) {
 	.command-trigger {
 		gap: 0.55rem;
 		border: 1px solid transparent;
-		background: rgba(0, 0, 0, 0.04);
-		padding: 0 0.55rem 0 0.75rem;
-		color: var(--btn-content);
+		background: rgba(0, 0, 0, 0.045);
+		padding: 0 1rem;
+		color: rgba(0, 0, 0, 0.38);
 		font-size: 0.9rem;
-		font-weight: 800;
+		font-weight: 700;
+		min-width: 10.5rem;
+		justify-content: flex-start;
 	}
 
 	:global(.dark) .command-trigger {
-		background: rgba(255, 255, 255, 0.055);
+		background: rgba(255, 255, 255, 0.07);
+		color: rgba(255, 255, 255, 0.48);
 	}
 
 	.command-trigger:hover,
 	.command-trigger:focus-visible {
 		border-color: color-mix(in oklch, var(--primary) 28%, transparent);
 		background: color-mix(in oklch, var(--primary) 10%, transparent);
+		color: var(--primary);
 		box-shadow: 0 10px 24px color-mix(in oklch, var(--primary) 12%, transparent);
 		transform: translateY(-1px);
-	}
-
-	.command-trigger kbd {
-		border-radius: 0.35rem;
-		background: rgba(0, 0, 0, 0.08);
-		padding: 0.08rem 0.32rem;
-		color: var(--btn-content);
-		font-size: 0.72rem;
-		font-weight: 900;
-	}
-
-	:global(.dark) .command-trigger kbd {
-		background: rgba(255, 255, 255, 0.1);
 	}
 
 	.command-backdrop {

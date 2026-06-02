@@ -204,32 +204,11 @@ const bannerOffset =
 }
 
 body {
-	background-image:
-		repeating-linear-gradient(
-			0deg,
-			color-mix(in oklch, var(--primary) 8%, transparent) 0 1px,
-			transparent 1px 34px
-		),
-		repeating-linear-gradient(
-			90deg,
-			color-mix(in oklch, var(--primary) 6%, transparent) 0 1px,
-			transparent 1px 34px
-		);
-	background-attachment: scroll;
+	background-image: none;
 }
 
 :root.dark body {
-	background-image:
-		repeating-linear-gradient(
-			0deg,
-			rgba(255, 255, 255, 0.028) 0 1px,
-			transparent 1px 34px
-		),
-		repeating-linear-gradient(
-			90deg,
-			rgba(255, 255, 255, 0.022) 0 1px,
-			transparent 1px 34px
-		);
+	background-image: none;
 }
 
 .card-base {
