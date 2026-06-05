@@ -109,8 +109,7 @@ export const categoryTree: TopCategory[] = [
 			{ name: "延迟操作", tags: ["优先队列", "延迟更新", "懒"] },
 			{ name: "双向链表", tags: ["双向链表"] },
 			{name :"维护第k大", tags: ['维护第k大']},
-			{name :"树状数组板子", tags: ["树状数组板子"]},
-			{name :"树状数组", tags: ["树状数组"]},
+			{name :"树状数组", tags: ["树状数组","树状数组板子"]},
 		],
 	},
 	{
