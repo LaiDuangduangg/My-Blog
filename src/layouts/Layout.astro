@@ -251,14 +251,12 @@ body {
 html.is-changing .transition-swup-fade {
 	transition:
 		opacity 220ms ease,
-		transform 220ms ease,
-		filter 220ms ease;
+		transform 220ms ease;
 }
 
 html.is-animating .transition-swup-fade {
 	opacity: 0;
 	transform: translateY(0.75rem) scale(0.992);
-	filter: blur(3px);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -270,7 +268,6 @@ html.is-animating .transition-swup-fade {
 
 	html.is-changing .transition-swup-fade,
 	html.is-animating .transition-swup-fade {
-		filter: none;
 		transform: none;
 	}
 }

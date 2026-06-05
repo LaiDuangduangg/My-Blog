@@ -149,7 +149,8 @@ export const categoryTree: TopCategory[] = [
 		name: "构造",
 		icon: "material-symbols:construction",
 		knowledgePoints: [
-			{ name: "构造", tags: ["构造"] },
+			{ name: "可达性构造", tags: ["可达性构造"] },
+			{ name: "区间约束构造", tags: ["区间约束构造"]},
 		],
 	},
 	{

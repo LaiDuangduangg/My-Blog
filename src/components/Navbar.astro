@@ -64,17 +64,16 @@ let links: NavBarLink[] = navBarConfig.links.map(
 <style>
     .navbar-shell {
         border-top: 0;
-        background: color-mix(in oklch, var(--card-bg) 94%, transparent);
+        background: color-mix(in oklch, var(--card-bg) 98%, white);
         box-shadow:
-            0 14px 42px rgba(0, 0, 0, 0.08),
+            0 12px 32px rgba(0, 0, 0, 0.07),
             inset 0 -1px 0 color-mix(in oklch, var(--primary) 10%, transparent);
-        backdrop-filter: blur(18px) saturate(1.08);
     }
 
     :global(.dark) .navbar-shell {
-        background: color-mix(in oklch, var(--card-bg) 88%, rgba(0, 0, 0, 0.18));
+        background: color-mix(in oklch, var(--card-bg) 96%, black);
         box-shadow:
-            0 16px 48px rgba(0, 0, 0, 0.28),
+            0 14px 38px rgba(0, 0, 0, 0.24),
             inset 0 -1px 0 rgba(255, 255, 255, 0.06);
     }
 

@@ -106,60 +106,13 @@ const { remarkPluginFrontmatter } = await entry.render();
 </div>
 <div class="transition border-t-[1px] border-dashed mx-6 border-black/10 dark:border-white/[0.15] last:border-t-0 md:hidden"></div>
 
-<script>
-const tiltMediaQuery = window.matchMedia("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)");
-
-function setupPostCardTilt() {
-	if (!tiltMediaQuery.matches) return;
-
-	document.querySelectorAll<HTMLElement>(".post-card:not([data-tilt-ready])").forEach((card) => {
-		card.setAttribute("data-tilt-ready", "true");
-
-		card.addEventListener("pointermove", (event) => {
-			const rect = card.getBoundingClientRect();
-			const x = (event.clientX - rect.left) / rect.width - 0.5;
-			const y = (event.clientY - rect.top) / rect.height - 0.5;
-
-			card.style.setProperty("--tilt-x", `${(-y * 5).toFixed(2)}deg`);
-			card.style.setProperty("--tilt-y", `${(x * 7).toFixed(2)}deg`);
-			card.style.setProperty("--shine-x", `${((x + 0.5) * 100).toFixed(1)}%`);
-			card.style.setProperty("--shine-y", `${((y + 0.5) * 100).toFixed(1)}%`);
-		});
-
-		card.addEventListener("pointerleave", () => {
-			card.style.setProperty("--tilt-x", "0deg");
-			card.style.setProperty("--tilt-y", "0deg");
-			card.style.setProperty("--shine-x", "50%");
-			card.style.setProperty("--shine-y", "50%");
-		});
-	});
-}
-
-setupPostCardTilt();
-
-if (window.swup?.hooks) {
-	window.swup.hooks.on("content:replace", setupPostCardTilt);
-} else {
-	document.addEventListener("swup:enable", () => {
-		window.swup?.hooks.on("content:replace", setupPostCardTilt);
-	}, { once: true });
-}
-</script>
-
 <style define:vars={{coverWidth}}>
 	.post-card {
 		isolation: isolate;
-		--tilt-x: 0deg;
-		--tilt-y: 0deg;
-		--shine-x: 50%;
-		--shine-y: 50%;
-		transform-style: preserve-3d;
-		will-change: transform;
 		transition:
-			transform 220ms ease,
-			box-shadow 220ms ease,
-			border-color 220ms ease,
-			background-color 220ms ease;
+			transform 180ms ease,
+			box-shadow 180ms ease,
+			border-color 180ms ease;
 	}
 
 	.post-card::before {
@@ -179,22 +132,6 @@ if (window.swup?.hooks) {
 				color-mix(in oklch, var(--primary) 8%, transparent),
 				transparent 45%
 			);
-		transition: opacity 220ms ease;
-	}
-
-	.post-card::after {
-		content: "";
-		position: absolute;
-		inset: 0;
-		z-index: 0;
-		pointer-events: none;
-		opacity: 0;
-		background: radial-gradient(
-			circle at var(--shine-x) var(--shine-y),
-			rgba(255, 255, 255, 0.24),
-			transparent 34%
-		);
-		mix-blend-mode: soft-light;
 		transition: opacity 180ms ease;
 	}
 
@@ -203,7 +140,7 @@ if (window.swup?.hooks) {
 	}
 
 	.post-card:hover {
-		transform: perspective(900px) translateY(-6px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+		transform: translateY(-4px);
 		border-color: color-mix(in oklch, var(--primary) 28%, transparent);
 		box-shadow:
 			0 18px 46px rgba(0, 0, 0, 0.075),
@@ -211,10 +148,6 @@ if (window.swup?.hooks) {
 	}
 
 	.post-card:hover::before {
-		opacity: 1;
-	}
-
-	.post-card:hover::after {
 		opacity: 1;
 	}
 
@@ -245,7 +178,6 @@ if (window.swup?.hooks) {
 	@media (prefers-reduced-motion: reduce) {
 		.post-card,
 		.post-card::before,
-		.post-card::after,
 		.post-card :global(.meta-icon),
 		.post-stats,
 		.post-description {
