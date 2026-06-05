@@ -46,15 +46,15 @@
 // =============================================================
 
 export interface KnowledgePoint {
-	name: string;                  // 知识点显示名
-	tags: string[];                // 命中任一 tag 就算这个知识点下的文章
-	children?: KnowledgePoint[];   // 可选：再细分的子知识点，可无限嵌套
+	name: string; // 知识点显示名
+	tags: string[]; // 命中任一 tag 就算这个知识点下的文章
+	children?: KnowledgePoint[]; // 可选：再细分的子知识点，可无限嵌套
 }
 
 export interface TopCategory {
-	name: string;                       // 顶层分类名（图论 / 数论 …）
-	icon?: string;                      // 可选 iconify 图标
-	knowledgePoints: KnowledgePoint[];  // 该分类下的知识点
+	name: string; // 顶层分类名（图论 / 数论 …）
+	icon?: string; // 可选 iconify 图标
+	knowledgePoints: KnowledgePoint[]; // 该分类下的知识点
 }
 
 export const categoryTree: TopCategory[] = [
@@ -63,17 +63,16 @@ export const categoryTree: TopCategory[] = [
 		icon: "material-symbols:hub-outline",
 		knowledgePoints: [
 			{ name: "树上问题", tags: ["LCA", "树形图"] },
-			{ 
+			{
 				name: "BFS",
 				tags: ["BFS"],
 				children: [
-					{name : "01BFS", tags: ["01BFS"]},
-					{name : "状态扩展BFS", tags: ["状态扩展BFS"]},
-					{name : "普通BFS", tags : ["普通BFS"]},
+					{ name: "01BFS", tags: ["01BFS"] },
+					{ name: "状态扩展BFS", tags: ["状态扩展BFS"] },
+					{ name: "普通BFS", tags: ["普通BFS"] },
 				],
 			},
-			{ name: "Dijkstra", tags: ["Dijkstra"]},
-
+			{ name: "Dijkstra", tags: ["Dijkstra"] },
 		],
 	},
 	{
@@ -82,12 +81,10 @@ export const categoryTree: TopCategory[] = [
 		knowledgePoints: [
 			{ name: "值域 DP", tags: ["值域dp"] },
 			{ name: "树形 DP", tags: ["树形DP", "树上背包"] },
-			{ 	name: "线性 DP",
+			{
+				name: "线性 DP",
 				tags: ["线性DP"],
-				children: [
-					{name: " 分段DP", tags: ["分段DP","一维选址DP"]},
-				]
-				
+				children: [{ name: " 分段DP", tags: ["分段DP", "一维选址DP"] }],
 			},
 			{
 				name: "计数 DP",
@@ -97,9 +94,7 @@ export const categoryTree: TopCategory[] = [
 					{ name: "子序列计数 DP", tags: ["子序列计数DP"] },
 					// 想再细分？直接在上面那行的 `}` 前面加 children: [...]，无限嵌套
 				],
-				
 			},
-			
 		],
 	},
 	{
@@ -108,9 +103,9 @@ export const categoryTree: TopCategory[] = [
 		knowledgePoints: [
 			{ name: "延迟操作", tags: ["优先队列", "延迟更新", "懒"] },
 			{ name: "双向链表", tags: ["双向链表"] },
-			{name :"维护第k大", tags: ['维护第k大']},
-			{name :"树状数组板子", tags: ["树状数组板子"]},
-			{name :"树状数组", tags: ["树状数组"]},
+			{ name: "维护第k大", tags: ["维护第k大"] },
+			{ name: "树状数组板子", tags: ["树状数组板子"] },
+			{ name: "树状数组", tags: ["树状数组"] },
 		],
 	},
 	{
@@ -126,8 +121,7 @@ export const categoryTree: TopCategory[] = [
 		knowledgePoints: [
 			{ name: "快速幂", tags: ["快速幂"] },
 			{ name: "公式变换 / 容斥", tags: ["公式变换", "斥容原理"] },
-			{ name : "数论分块", tags: ["数论分块"]},
-
+			{ name: "数论分块", tags: ["数论分块"] },
 		],
 	},
 	{
@@ -141,16 +135,12 @@ export const categoryTree: TopCategory[] = [
 	{
 		name: "搜索与暴力",
 		icon: "material-symbols:search",
-		knowledgePoints: [
-			{ name: "暴力枚举", tags: ["暴力枚举"] },
-		],
+		knowledgePoints: [{ name: "暴力枚举", tags: ["暴力枚举"] }],
 	},
 	{
 		name: "构造",
 		icon: "material-symbols:construction",
-		knowledgePoints: [
-			{ name: "构造", tags: ["构造"] },
-		],
+		knowledgePoints: [{ name: "可达性构造", tags: ["可达性构造"] }],
 	},
 	{
 		name: "二分",
@@ -164,14 +154,17 @@ export const categoryTree: TopCategory[] = [
 		icon: "material-symbols:dataset-outline",
 		knowledgePoints: [
 			// 以后写到组合数学相关的题再补
-			{name : "隔板法/插板法", tags: ["隔板法", "插板法"]},
+			{ name: "隔板法/插板法", tags: ["隔板法", "插板法"] },
 		],
 	},
 	{
 		name: "杂项",
 		icon: "material-symbols:more-horiz",
 		knowledgePoints: [
-			{ name: "回文数 / 进制 / 高精度", tags: ["回文数", "进制转化", "高精度"] },
+			{
+				name: "回文数 / 进制 / 高精度",
+				tags: ["回文数", "进制转化", "高精度"],
+			},
 		],
 	},
 ];
