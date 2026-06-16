@@ -1,9 +1,19 @@
 .custom-md {
+    position: relative;
+    color: color-mix(in oklch, var(--tw-prose-body) 92%, black);
+
+    > * + * {
+        margin-top: 1.05em;
+    }
+
     h1 {
         @apply text-3xl;
     }
 
     h1, h2, h3, h4, h5, h6 {
+        scroll-margin-top: 6rem;
+        letter-spacing: 0;
+
         .anchor {
             @apply transition -m-0.5 ml-[0.2ch] p-0.5 select-none opacity-0 no-underline !important;
 
@@ -140,6 +150,42 @@
         }
     }
 
+    h2 {
+        position: relative;
+        margin-top: 2.2rem;
+        border-bottom: 1px dashed color-mix(in oklch, var(--primary) 20%, transparent);
+        padding-bottom: 0.45rem;
+    }
+
+    h2::before {
+        content: "";
+        position: absolute;
+        left: -1rem;
+        top: 0.35em;
+        width: 0.32rem;
+        height: 1.05em;
+        border-radius: 999px;
+        background: var(--primary);
+        box-shadow: 0 0 16px color-mix(in oklch, var(--primary) 38%, transparent);
+    }
+
+    h3 {
+        margin-top: 1.65rem;
+        color: color-mix(in oklch, var(--tw-prose-headings) 88%, var(--primary));
+    }
+
+    p {
+        line-height: 1.9;
+    }
+
+    > section {
+        position: relative;
+    }
+
+    > section + section {
+        margin-top: 1.6rem;
+    }
+
 
     ul, ol {
         li::marker {
@@ -148,11 +194,21 @@
     }
 
     blockquote {
-        @apply not-italic border-transparent relative;
+        @apply not-italic relative;
+        border: 1px solid color-mix(in oklch, var(--primary) 16%, transparent);
+        border-left: 0;
+        border-radius: 1rem;
+        background:
+            linear-gradient(90deg, color-mix(in oklch, var(--primary) 12%, transparent), transparent 46%),
+            color-mix(in oklch, var(--card-bg) 82%, transparent);
+        padding: 1.05rem 1.2rem;
         font-weight: inherit;
+        box-shadow:
+            0 12px 30px rgba(0, 0, 0, 0.045),
+            inset 0 1px 0 rgba(255, 255, 255, 0.24);
 
         &:before {
-            @apply content-[''] absolute -left-1 block transition bg-[var(--btn-regular-bg)] h-full w-1 rounded-full;
+            @apply content-[''] absolute left-0 top-0 block transition bg-[var(--primary)] h-full w-1 rounded-full;
         }
 
         /* Remove the double quotes from default styles */
@@ -169,6 +225,22 @@
         margin: 1em 0;
         contain: layout paint style;
         scrollbar-gutter: stable;
+    }
+
+    table {
+        overflow: hidden;
+        border-radius: 1rem;
+        box-shadow:
+            0 0 0 1px color-mix(in oklch, var(--primary) 12%, transparent),
+            0 12px 30px rgba(0, 0, 0, 0.045);
+    }
+
+    th {
+        background: color-mix(in oklch, var(--primary) 10%, var(--card-bg));
+    }
+
+    tr:nth-child(even) {
+        background: color-mix(in oklch, var(--primary) 3%, transparent);
     }
 
     .katex-display > .katex {

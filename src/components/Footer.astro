@@ -6,10 +6,8 @@ import { url } from "../utils/url-utils";
 const currentYear = new Date().getFullYear();
 ---
 
-<!--<div class="border-t border-[var(&#45;&#45;primary)] mx-16 border-dashed py-8 max-w-[var(&#45;&#45;page-width)] flex flex-col items-center justify-center px-6">-->
-<div class="transition border-t border-black/10 dark:border-white/15 my-10 border-dashed mx-32"></div>
-<!--<div class="transition bg-[oklch(92%_0.01_var(&#45;&#45;hue))] dark:bg-black rounded-2xl py-8 mt-4 mb-8 flex flex-col items-center justify-center px-6">-->
-<div class="transition border-dashed border-[oklch(85%_0.01_var(--hue))] dark:border-white/15 rounded-2xl mb-12 flex flex-col items-center justify-center px-6">
+<div class="footer-divider transition border-t border-black/10 dark:border-white/15 my-10 border-dashed mx-32"></div>
+<div class="footer-shell transition rounded-2xl mb-12 flex flex-col items-center justify-center px-6 py-5">
     <div class="transition text-50 text-sm text-center">
         &copy; <span id="copyright-year">{currentYear}</span> {profileConfig.name}. All Rights Reserved. /
         <a class="transition link text-[var(--primary)] font-medium" target="_blank" href={url('rss.xml')}>RSS</a> /
@@ -19,3 +17,37 @@ const currentYear = new Date().getFullYear();
         <a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://github.com/saicaca/fuwari">Fuwari</a>
     </div>
 </div>
+
+<style>
+    .footer-divider {
+        border-color: color-mix(in oklch, var(--primary) 16%, transparent);
+    }
+
+    .footer-shell {
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        border: 1px solid color-mix(in oklch, var(--primary) 12%, transparent);
+        background: color-mix(in oklch, var(--card-bg) 58%, transparent);
+        box-shadow:
+            0 14px 36px rgba(0, 0, 0, 0.045),
+            inset 0 1px 0 rgba(255, 255, 255, 0.32);
+    }
+
+    .footer-shell::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background:
+            linear-gradient(90deg, transparent, color-mix(in oklch, var(--primary) 8%, transparent), transparent),
+            repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 12px);
+        opacity: 0.65;
+    }
+
+    :global(.dark) .footer-shell {
+        box-shadow:
+            0 16px 42px rgba(0, 0, 0, 0.24),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+</style>

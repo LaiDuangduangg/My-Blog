@@ -48,11 +48,11 @@ const jsonLd = {
 <MainGridLayout banner={entry.data.image} title={entry.data.title} description={entry.data.description} lang={entry.data.lang} setOGTypeArticle={true} headings={headings}>
     <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
     <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4">
-        <div id="post-container" class:list={["card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full ",
+        <div id="post-container" class:list={["post-shell card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full ",
             {}
         ]}>
             <!-- word count and reading time -->
-            <div class="flex flex-row text-black/30 dark:text-white/30 gap-5 mb-3 transition onload-animation">
+            <div class="post-topline flex flex-row text-black/30 dark:text-white/30 gap-5 mb-3 transition onload-animation">
                 <div class="flex flex-row items-center">
                     <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2">
                         <Icon name="material-symbols:notes-rounded"></Icon>
@@ -70,10 +70,14 @@ const jsonLd = {
             </div>
 
             <!-- title -->
-            <div class="relative onload-animation">
+            <div class="post-title-block relative onload-animation">
+                <div class="post-title-label">
+                    <Icon name="material-symbols:terminal-rounded" />
+                    Problem Solution
+                </div>
                 <div
                     data-pagefind-body data-pagefind-weight="10" data-pagefind-meta="title"
-                    class="transition w-full block font-bold mb-3
+                    class="post-title transition w-full block font-bold mb-3
                     text-3xl md:text-[2.25rem]/[2.75rem]
                     text-black/90 dark:text-white/90
                     md:before:w-1 before:h-5 before:rounded-md before:bg-[var(--primary)]
@@ -84,7 +88,7 @@ const jsonLd = {
             </div>
 
             <!-- metadata -->
-            <div class="onload-animation">
+            <div class="post-meta-panel onload-animation">
                 <PostMetadata
                         class="mb-5"
                         published={entry.data.published}
@@ -98,15 +102,15 @@ const jsonLd = {
             <!-- always show cover as long as it has one -->
 
             {entry.data.image &&
-                <ImageWrapper id="post-cover" src={entry.data.image} basePath={path.join("content/posts/", getDir(entry.id))} class="mb-8 rounded-xl banner-container onload-animation"/>
+                <ImageWrapper id="post-cover" src={entry.data.image} basePath={path.join("content/posts/", getDir(entry.id))} class="mb-8 rounded-xl banner-container"/>
             }
 
 
-            <Markdown class="mb-6 markdown-content onload-animation">
+            <Markdown class="mb-6 markdown-content">
                 <Content />
             </Markdown>
 
-            {licenseConfig.enable && <License title={entry.data.title} slug={entry.slug} pubDate={entry.data.published} class="mb-6 rounded-xl license-container onload-animation"></License>}
+            {licenseConfig.enable && <License title={entry.data.title} slug={entry.slug} pubDate={entry.data.published} class="mb-6 rounded-xl license-container"></License>}
 
         </div>
     </div>
@@ -134,3 +138,108 @@ const jsonLd = {
     </div>
 
 </MainGridLayout>
+
+<style is:global>
+    #post-container.post-shell {
+        overflow: hidden;
+    }
+
+    #post-container.post-shell::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto;
+        z-index: -1;
+        height: 16rem;
+        background:
+            linear-gradient(90deg, color-mix(in oklch, var(--primary) 58%, white) 0 0.28rem, transparent 0.28rem),
+            radial-gradient(circle at 12% 0%, color-mix(in oklch, var(--primary) 18%, transparent), transparent 38%),
+            linear-gradient(180deg, color-mix(in oklch, var(--primary) 7%, transparent), transparent);
+        pointer-events: none;
+    }
+
+    #post-container .post-topline {
+        position: relative;
+        z-index: 1;
+        width: fit-content;
+        border: 1px solid color-mix(in oklch, var(--primary) 12%, transparent);
+        border-radius: 999px;
+        background: color-mix(in oklch, var(--card-bg) 86%, transparent);
+        padding: 0.35rem 0.65rem;
+    }
+
+    #post-container .post-title-block {
+        position: relative;
+        margin-top: 0.75rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+    }
+
+    #post-container .post-title-block::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 1px;
+        background: linear-gradient(90deg, color-mix(in oklch, var(--primary) 32%, transparent), transparent);
+    }
+
+    #post-container .post-title-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.42rem;
+        border: 1px solid color-mix(in oklch, var(--primary) 16%, transparent);
+        border-radius: 999px;
+        background: color-mix(in oklch, var(--primary) 7%, transparent);
+        padding: 0.28rem 0.6rem;
+        color: var(--primary);
+        font-size: 0.72rem;
+        font-weight: 950;
+        letter-spacing: 0;
+        margin-bottom: 0.75rem;
+    }
+
+    #post-container .post-title {
+        font-size: clamp(2rem, 4vw, 3.4rem);
+        line-height: 1.05;
+        letter-spacing: 0;
+    }
+
+    #post-container .post-meta-panel {
+        border: 1px solid color-mix(in oklch, var(--primary) 12%, transparent);
+        border-radius: 1rem;
+        background: color-mix(in oklch, var(--card-bg) 78%, transparent);
+        margin-bottom: 1.35rem;
+        padding: 0.9rem 1rem 0;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    }
+
+    #post-cover {
+        border: 1px solid color-mix(in oklch, var(--primary) 16%, transparent);
+        box-shadow: 0 18px 44px rgba(0, 0, 0, 0.1);
+    }
+
+    #post-container .license-container {
+        border: 1px solid color-mix(in oklch, var(--primary) 14%, transparent);
+        box-shadow:
+            0 14px 34px rgba(0, 0, 0, 0.06),
+            inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    }
+
+    #post-container .markdown-content,
+    #post-container .markdown-content > *,
+    #post-container .markdown-content section,
+    #post-container .markdown-content section > *,
+    #post-container .markdown-content :is(p, h1, h2, h3, h4, h5, h6, ul, ol, blockquote, table, .expressive-code, .katex-display, .katex-display-container),
+    #post-cover,
+    .license-container {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+        visibility: visible !important;
+    }
+
+    #post-container .markdown-content {
+        display: block !important;
+    }
+</style>

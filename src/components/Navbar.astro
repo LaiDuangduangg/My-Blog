@@ -10,6 +10,7 @@ import DisplaySettings from "./widget/DisplaySettings.svelte";
 import NavMenuPanel from "./widget/NavMenuPanel.astro";
 
 const className = Astro.props.class;
+const currentPath = Astro.url.pathname;
 
 let links: NavBarLink[] = navBarConfig.links.map(
 	(item: NavBarLink | LinkPreset): NavBarLink => {
@@ -25,16 +26,21 @@ let links: NavBarLink[] = navBarConfig.links.map(
     <div class:list={[
         className,
         "navbar-shell card-base !overflow-visible max-w-[var(--page-width)] h-[4.5rem] !rounded-t-none mx-auto flex items-center justify-between px-4"]}>
-        <a href={url('/')} class="btn-plain scale-animation rounded-lg h-[3.25rem] px-5 font-bold active:scale-95">
+        <a href={url('/')} class:list={["nav-brand btn-plain scale-animation rounded-lg h-[3.25rem] px-5 font-bold active:scale-95", {"nav-current": currentPath === url("/")}]}>
             <div class="flex flex-row text-[var(--primary)] items-center text-md">
                 <Icon name="material-symbols:home-outline-rounded" class="text-[1.75rem] mb-1 mr-2" />
                 {siteConfig.title}
             </div>
         </a>
-        <div class="hidden md:flex">
+        <div class="nav-link-group hidden md:flex">
             {links.map((l) => {
-                return <a aria-label={l.name} href={l.external ? l.url : url(l.url)} target={l.external ? "_blank" : null}
-                          class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"
+                const href = l.external ? l.url : url(l.url);
+                const isCurrent = !l.external && (
+                    currentPath === href ||
+                    (href !== url("/") && currentPath.startsWith(href))
+                );
+                return <a aria-label={l.name} href={href} target={l.external ? "_blank" : null}
+                          class:list={["nav-link btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95", {"nav-current": isCurrent}]}
                 >
                     <div class="flex items-center">
                         {l.name}
@@ -43,7 +49,7 @@ let links: NavBarLink[] = navBarConfig.links.map(
                 </a>;
             })}
         </div>
-        <div class="flex">
+        <div class="nav-tools flex">
             <!--<SearchPanel client:load>-->
             <Search client:only="svelte"></Search>
             {!siteConfig.themeColor.fixed && (
@@ -63,18 +69,85 @@ let links: NavBarLink[] = navBarConfig.links.map(
 
 <style>
     .navbar-shell {
+        position: relative;
+        isolation: isolate;
         border-top: 0;
-        background: color-mix(in oklch, var(--card-bg) 98%, white);
+        overflow: hidden;
+        background:
+            linear-gradient(135deg, color-mix(in oklch, var(--card-bg) 88%, white), color-mix(in oklch, var(--card-bg) 78%, white)),
+            radial-gradient(circle at 12% 0%, color-mix(in oklch, var(--primary) 28%, transparent), transparent 40%);
         box-shadow:
-            0 12px 32px rgba(0, 0, 0, 0.07),
-            inset 0 -1px 0 color-mix(in oklch, var(--primary) 10%, transparent);
+            0 18px 48px rgba(0, 0, 0, 0.12),
+            0 0 0 1px color-mix(in oklch, var(--primary) 12%, transparent),
+            inset 0 -1px 0 color-mix(in oklch, var(--primary) 26%, transparent);
+    }
+
+    .nav-link-group,
+    .nav-tools {
+        position: relative;
+        z-index: 1;
+        border: 1px solid color-mix(in oklch, var(--primary) 10%, transparent);
+        border-radius: 0.9rem;
+        background: color-mix(in oklch, var(--card-bg) 62%, transparent);
+        padding: 0.2rem;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    }
+
+    .nav-brand,
+    .nav-link {
+        position: relative;
+        z-index: 1;
+    }
+
+    .nav-current {
+        color: var(--primary);
+    }
+
+    .nav-current::after {
+        content: "";
+        position: absolute;
+        left: 1rem;
+        right: 1rem;
+        bottom: 0.35rem;
+        height: 2px;
+        border-radius: 999px;
+        background: var(--primary);
+        box-shadow: 0 0 12px color-mix(in oklch, var(--primary) 52%, transparent);
+    }
+
+    .navbar-shell::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        opacity: 0.95;
+        background:
+            linear-gradient(90deg, color-mix(in oklch, var(--primary) 42%, transparent) 0 0.28rem, transparent 0.28rem),
+            radial-gradient(circle at 16% 0%, color-mix(in oklch, var(--primary) 28%, transparent), transparent 34%),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.42), transparent 48%);
+    }
+
+    .navbar-shell::after {
+        content: "";
+        position: absolute;
+        left: 1.25rem;
+        right: 1.25rem;
+        bottom: 0;
+        height: 1px;
+        pointer-events: none;
+        background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--primary) 65%, white), transparent);
+        opacity: 0.7;
     }
 
     :global(.dark) .navbar-shell {
-        background: color-mix(in oklch, var(--card-bg) 96%, black);
+        background:
+            linear-gradient(135deg, color-mix(in oklch, var(--card-bg) 86%, white 5%), color-mix(in oklch, var(--card-bg) 96%, black)),
+            radial-gradient(circle at 12% 0%, color-mix(in oklch, var(--primary) 30%, transparent), transparent 40%);
         box-shadow:
-            0 14px 38px rgba(0, 0, 0, 0.24),
-            inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+            0 20px 56px rgba(0, 0, 0, 0.34),
+            0 0 0 1px rgba(255, 255, 255, 0.08),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.08);
     }
 
     @media (max-width: 768px) {

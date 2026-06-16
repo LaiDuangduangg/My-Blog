@@ -1,10 +1,33 @@
 .expressive-code {
     .frame {
         @apply !shadow-none;
+        border-radius: 1rem !important;
+        background:
+            linear-gradient(135deg, color-mix(in oklch, var(--codeblock-bg) 92%, white 3%), var(--codeblock-bg)) !important;
         transition:
             border-color 180ms ease,
             box-shadow 180ms ease,
             transform 180ms ease;
+    }
+
+    .frame::before {
+        content: "";
+        position: absolute;
+        left: 1rem;
+        top: 0.72rem;
+        z-index: 5;
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 999px;
+        background: #ff5f57;
+        box-shadow:
+            0.9rem 0 0 #ffbd2e,
+            1.8rem 0 0 #28c840;
+        pointer-events: none;
+    }
+
+    .header {
+        padding-left: 3.4rem !important;
     }
 
     @media (hover: hover) and (pointer: fine) {
@@ -16,6 +39,7 @@
 
     .title {
         font-family: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        letter-spacing: 0;
     }
 }
 

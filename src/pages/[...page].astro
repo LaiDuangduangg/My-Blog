@@ -1,10 +1,18 @@
 ---
 import type { GetStaticPaths } from "astro";
+import { Icon } from "astro-icon/components";
 import Pagination from "../components/control/Pagination.astro";
 import PostPage from "../components/PostPage.astro";
+import { profileConfig } from "../config";
 import { PAGE_SIZE } from "../constants/constants";
 import MainGridLayout from "../layouts/MainGridLayout.astro";
-import { getSortedPosts } from "../utils/content-utils";
+import {
+	getCategoryList,
+	getSortedPosts,
+	getTagList,
+} from "../utils/content-utils";
+import { formatDateToYYYYMMDD } from "../utils/date-utils";
+import { getPostUrlBySlug, url } from "../utils/url-utils";
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const allBlogPosts = await getSortedPosts();
@@ -15,9 +23,402 @@ export const getStaticPaths = (async ({ paginate }) => {
 const { page } = Astro.props;
 
 const len = page.data.length;
+const totalPosts = page.total;
+const categories = await getCategoryList();
+const tags = await getTagList();
+const latestPosts = page.data.slice(0, 3);
+const topCategories = [...categories].sort((a, b) => b.count - a.count).slice(0, 4);
+const topTags = [...tags].sort((a, b) => b.count - a.count).slice(0, 8);
 ---
 
 <MainGridLayout>
+    {page.currentPage === 1 && (
+        <section class="home-console card-base motion-reveal" style="--reveal-delay: 90ms" aria-label="Knowledge base console">
+            <div class="home-console-grid">
+                <div class="home-console-main">
+                    <div class="home-kicker">
+                        <Icon name="material-symbols:account-tree-outline-rounded" />
+                        Knowledge Base
+                    </div>
+                    <h1>算法知识库首页</h1>
+                    <p>{profileConfig.name} 的题解、知识点、模板和复盘入口。</p>
+                    <div class="home-actions">
+                        <a href={url("/catalog/")} class="home-action primary">
+                            <Icon name="material-symbols:account-tree-outline-rounded" />
+                            知识目录
+                        </a>
+                        <a href={url("/archive/")} class="home-action">
+                            <Icon name="material-symbols:event-note-outline-rounded" />
+                            时间归档
+                        </a>
+                    </div>
+                </div>
+
+                <div class="home-console-stats" aria-label="Stats">
+                    <div>
+                        <strong>{totalPosts}</strong>
+                        <span>Notes</span>
+                    </div>
+                    <div>
+                        <strong>{categories.length}</strong>
+                        <span>Categories</span>
+                    </div>
+                    <div>
+                        <strong>{tags.length}</strong>
+                        <span>Tags</span>
+                    </div>
+                    <div>
+                        <strong>{page.lastPage}</strong>
+                        <span>Pages</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="home-console-lower">
+                <div class="home-panel latest-panel">
+                    <div class="home-panel-title">
+                        <Icon name="material-symbols:bolt-outline-rounded" />
+                        最近更新
+                    </div>
+                    <div class="latest-list">
+                        {latestPosts.map((post) => (
+                            <a href={getPostUrlBySlug(post.slug)} class="latest-item">
+                                <span>{formatDateToYYYYMMDD(post.data.published)}</span>
+                                <strong>{post.data.title}</strong>
+                            </a>
+                        ))}
+                    </div>
+                </div>
+
+                <div class="home-panel taxonomy-panel">
+                    <div class="home-panel-title">
+                        <Icon name="material-symbols:category-outline-rounded" />
+                        高频分类
+                    </div>
+                    <div class="category-meter-list">
+                        {topCategories.map((category) => (
+                            <a href={category.url} class="category-meter">
+                                <span>{category.name}</span>
+                                <strong>{category.count}</strong>
+                            </a>
+                        ))}
+                    </div>
+                    <div class="tag-strip" aria-label="Top tags">
+                        {topTags.map((tag) => (
+                            <a href={url(`/archive/?tag=${encodeURIComponent(tag.name.trim())}`)}>
+                                #{tag.name}
+                            </a>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </section>
+    )}
     <PostPage page={page}></PostPage>
     <Pagination class="mx-auto onload-animation" page={page} style={`animation-delay: calc(var(--content-delay) + ${(len)*50}ms)`}></Pagination>
 </MainGridLayout>
+
+<style>
+    .home-console {
+        position: relative;
+        isolation: isolate;
+        margin-bottom: 1rem;
+        padding: 1.2rem;
+        overflow: hidden;
+    }
+
+    .home-console::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background:
+            linear-gradient(90deg, color-mix(in oklch, var(--primary) 64%, white) 0 0.3rem, transparent 0.3rem),
+            radial-gradient(circle at 12% 0%, color-mix(in oklch, var(--primary) 24%, transparent), transparent 38%),
+            radial-gradient(circle at 88% 0%, rgba(42, 142, 255, 0.14), transparent 34%),
+            linear-gradient(135deg, color-mix(in oklch, var(--primary) 8%, transparent), transparent 48%);
+        pointer-events: none;
+    }
+
+    .home-console-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(17rem, 24rem);
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .home-console-main,
+    .home-panel {
+        border: 1px solid color-mix(in oklch, var(--primary) 13%, transparent);
+        border-radius: 0.95rem;
+        background: color-mix(in oklch, var(--card-bg) 72%, transparent);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34);
+    }
+
+    .home-console-main {
+        min-height: 15rem;
+        padding: 1.3rem;
+    }
+
+    .home-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        border: 1px solid color-mix(in oklch, var(--primary) 20%, transparent);
+        border-radius: 999px;
+        background: color-mix(in oklch, var(--primary) 8%, transparent);
+        padding: 0.32rem 0.65rem;
+        color: var(--primary);
+        font-size: 0.78rem;
+        font-weight: 900;
+        letter-spacing: 0;
+    }
+
+    .home-kicker :global(svg) {
+        font-size: 1rem;
+    }
+
+    .home-console h1 {
+        margin-top: 0.65rem;
+        color: rgba(0, 0, 0, 0.88);
+        font-size: clamp(2.15rem, 4vw, 3.8rem);
+        line-height: 1.02;
+        font-weight: 950;
+        letter-spacing: 0;
+    }
+
+    :global(.dark) .home-console h1 {
+        color: rgba(255, 255, 255, 0.92);
+    }
+
+    .home-console p {
+        margin-top: 0.7rem;
+        max-width: 34rem;
+        color: rgba(0, 0, 0, 0.56);
+        font-size: 0.98rem;
+        line-height: 1.8;
+    }
+
+    :global(.dark) .home-console p {
+        color: rgba(255, 255, 255, 0.58);
+    }
+
+    .home-console-stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.65rem;
+        align-self: stretch;
+    }
+
+    .home-console-stats div {
+        min-height: 7rem;
+        border: 1px solid color-mix(in oklch, var(--primary) 14%, transparent);
+        border-radius: 0.9rem;
+        background: color-mix(in oklch, var(--card-bg) 78%, transparent);
+        padding: 1rem;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34);
+    }
+
+    .home-console-stats strong,
+    .home-console-stats span {
+        display: block;
+    }
+
+    .home-console-stats strong {
+        color: var(--primary);
+        font-size: 2rem;
+        line-height: 1;
+        font-weight: 950;
+    }
+
+    .home-console-stats span {
+        margin-top: 0.35rem;
+        color: rgba(0, 0, 0, 0.44);
+        font-size: 0.72rem;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    :global(.dark) .home-console-stats span {
+        color: rgba(255, 255, 255, 0.44);
+    }
+
+    .home-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+        margin-top: 1.2rem;
+    }
+
+    .home-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: 1px solid color-mix(in oklch, var(--primary) 16%, transparent);
+        border-radius: 0.85rem;
+        background: color-mix(in oklch, var(--card-bg) 78%, transparent);
+        padding: 0.72rem 0.9rem;
+        color: rgba(0, 0, 0, 0.72);
+        font-weight: 900;
+        transition:
+            transform 180ms var(--motion-ease-out, ease),
+            background-color 180ms ease,
+            color 180ms ease,
+            box-shadow 180ms ease;
+    }
+
+    .home-action.primary,
+    .home-action:hover {
+        background: color-mix(in oklch, var(--primary) 12%, transparent);
+        color: var(--primary);
+        box-shadow: 0 12px 28px color-mix(in oklch, var(--primary) 12%, transparent);
+        transform: translateY(-2px);
+    }
+
+    :global(.dark) .home-action {
+        color: rgba(255, 255, 255, 0.74);
+    }
+
+    .home-console-lower {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(17rem, 24rem);
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .home-panel {
+        padding: 1rem;
+    }
+
+    .home-panel-title {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        color: var(--primary);
+        font-size: 0.82rem;
+        font-weight: 950;
+        letter-spacing: 0;
+        margin-bottom: 0.75rem;
+    }
+
+    .latest-list,
+    .category-meter-list {
+        display: grid;
+        gap: 0.55rem;
+    }
+
+    .latest-item,
+    .category-meter {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: center;
+        gap: 0.75rem;
+        border-radius: 0.75rem;
+        padding: 0.7rem 0.75rem;
+        color: rgba(0, 0, 0, 0.72);
+        background: color-mix(in oklch, var(--primary) 4%, transparent);
+        transition:
+            transform 180ms ease,
+            background-color 180ms ease,
+            color 180ms ease;
+    }
+
+    .latest-item:hover,
+    .category-meter:hover {
+        color: var(--primary);
+        background: color-mix(in oklch, var(--primary) 9%, transparent);
+        transform: translateX(0.25rem);
+    }
+
+    :global(.dark) .latest-item,
+    :global(.dark) .category-meter {
+        color: rgba(255, 255, 255, 0.72);
+    }
+
+    .latest-item span {
+        color: rgba(0, 0, 0, 0.42);
+        font-size: 0.76rem;
+        font-weight: 900;
+        font-variant-numeric: tabular-nums;
+    }
+
+    :global(.dark) .latest-item span {
+        color: rgba(255, 255, 255, 0.42);
+    }
+
+    .latest-item strong,
+    .category-meter span {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-weight: 900;
+    }
+
+    .category-meter {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .category-meter strong {
+        display: inline-grid;
+        min-width: 1.65rem;
+        height: 1.65rem;
+        place-items: center;
+        border-radius: 999px;
+        background: var(--primary);
+        color: var(--card-bg);
+        font-size: 0.78rem;
+        line-height: 1;
+    }
+
+    .tag-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+        margin-top: 0.8rem;
+    }
+
+    .tag-strip a {
+        border-radius: 999px;
+        background: color-mix(in oklch, var(--primary) 7%, transparent);
+        padding: 0.32rem 0.55rem;
+        color: var(--primary);
+        font-size: 0.76rem;
+        font-weight: 900;
+    }
+
+    @media (max-width: 768px) {
+        .home-console-grid,
+        .home-console-lower {
+            grid-template-columns: 1fr;
+        }
+
+        .home-console {
+            padding: 1.15rem;
+        }
+
+        .home-console-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .home-console-stats div {
+            min-height: 0;
+            padding: 0.7rem 0.55rem;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .home-action,
+        .latest-item,
+        .category-meter {
+            transition: none;
+        }
+
+        .home-action.primary,
+        .home-action:hover,
+        .latest-item:hover,
+        .category-meter:hover {
+            transform: none;
+        }
+    }
+</style>

@@ -30,6 +30,8 @@ interface Group {
 }
 
 let groups: Group[] = [];
+let filteredCount = 0;
+let yearRange = "";
 
 function formatDate(date: Date) {
 	const month = (date.getMonth() + 1).toString().padStart(2, "0");
@@ -82,13 +84,40 @@ onMount(async () => {
 	groupedPostsArray.sort((a, b) => b.year - a.year);
 
 	groups = groupedPostsArray;
+	filteredCount = filteredPosts.length;
+	if (groupedPostsArray.length > 0) {
+		const years = groupedPostsArray.map((group) => group.year);
+		yearRange = `${Math.min(...years)} - ${Math.max(...years)}`;
+	} else {
+		yearRange = "N/A";
+	}
 });
 </script>
 
-<div class="card-base px-8 py-6">
+<div class="archive-panel card-base px-8 py-6">
+    <div class="archive-dashboard">
+        <div class="archive-dashboard-main">
+            <span>Archive Console</span>
+            <strong>时间线归档</strong>
+        </div>
+        <div class="archive-dashboard-stats">
+            <div>
+                <strong>{filteredCount}</strong>
+                <span>Posts</span>
+            </div>
+            <div>
+                <strong>{groups.length}</strong>
+                <span>Years</span>
+            </div>
+            <div>
+                <strong>{yearRange}</strong>
+                <span>Range</span>
+            </div>
+        </div>
+    </div>
     {#each groups as group}
         <div>
-            <div class="flex flex-row w-full items-center h-[3.75rem]">
+            <div class="archive-year flex flex-row w-full items-center h-[3.75rem]">
                 <div class="w-[15%] md:w-[10%] transition text-2xl font-bold text-right text-75">
                     {group.year}
                 </div>
@@ -107,7 +136,7 @@ onMount(async () => {
                 <a
                         href={getPostUrlBySlug(post.slug)}
                         aria-label={post.data.title}
-                        class="group btn-plain !block h-10 w-full rounded-lg hover:text-[initial]"
+                        class="archive-entry group btn-plain !block h-10 w-full rounded-lg hover:text-[initial]"
                 >
                     <div class="flex flex-row justify-start items-center h-full">
                         <!-- date -->
@@ -149,3 +178,156 @@ onMount(async () => {
         </div>
     {/each}
 </div>
+
+<style>
+	.archive-panel {
+		position: relative;
+		isolation: isolate;
+		overflow: hidden;
+	}
+
+	.archive-dashboard {
+		position: relative;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 1rem;
+		align-items: stretch;
+		margin-bottom: 1.2rem;
+		border: 1px solid color-mix(in oklch, var(--primary) 13%, transparent);
+		border-radius: 1rem;
+		background: color-mix(in oklch, var(--card-bg) 72%, transparent);
+		padding: 1rem;
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+	}
+
+	.archive-dashboard-main {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		min-width: 0;
+	}
+
+	.archive-dashboard-main span {
+		color: var(--primary);
+		font-size: 0.76rem;
+		font-weight: 950;
+		text-transform: uppercase;
+	}
+
+	.archive-dashboard-main strong {
+		margin-top: 0.25rem;
+		color: rgba(0, 0, 0, 0.84);
+		font-size: 1.6rem;
+		font-weight: 950;
+		line-height: 1;
+	}
+
+	:global(.dark) .archive-dashboard-main strong {
+		color: rgba(255, 255, 255, 0.9);
+	}
+
+	.archive-dashboard-stats {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(4.7rem, 1fr));
+		gap: 0.55rem;
+	}
+
+	.archive-dashboard-stats div {
+		border: 1px solid color-mix(in oklch, var(--primary) 10%, transparent);
+		border-radius: 0.8rem;
+		background: color-mix(in oklch, var(--primary) 5%, transparent);
+		padding: 0.7rem 0.75rem;
+	}
+
+	.archive-dashboard-stats strong,
+	.archive-dashboard-stats span {
+		display: block;
+	}
+
+	.archive-dashboard-stats strong {
+		color: var(--primary);
+		font-size: 1.1rem;
+		font-weight: 950;
+		white-space: nowrap;
+	}
+
+	.archive-dashboard-stats span {
+		margin-top: 0.25rem;
+		color: rgba(0, 0, 0, 0.42);
+		font-size: 0.68rem;
+		font-weight: 900;
+		text-transform: uppercase;
+	}
+
+	:global(.dark) .archive-dashboard-stats span {
+		color: rgba(255, 255, 255, 0.42);
+	}
+
+	.archive-panel::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background:
+			linear-gradient(90deg, color-mix(in oklch, var(--primary) 52%, white) 0 0.26rem, transparent 0.26rem),
+			radial-gradient(circle at 12% 0%, color-mix(in oklch, var(--primary) 18%, transparent), transparent 36%),
+			repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 9px);
+		opacity: 0.76;
+		pointer-events: none;
+	}
+
+	.archive-year {
+		position: relative;
+	}
+
+	.archive-year > div:first-child {
+		color: var(--primary);
+		text-shadow: 0 0 18px color-mix(in oklch, var(--primary) 18%, transparent);
+	}
+
+	.archive-year::after {
+		content: "";
+		position: absolute;
+		left: 25%;
+		right: 0;
+		bottom: 0.4rem;
+		height: 1px;
+		background: linear-gradient(90deg, color-mix(in oklch, var(--primary) 28%, transparent), transparent);
+	}
+
+	.archive-entry {
+		position: relative;
+		transition:
+			transform 180ms ease,
+			background-color 180ms ease,
+			box-shadow 180ms ease;
+	}
+
+	.archive-entry:hover {
+		transform: translateX(0.25rem);
+		background: color-mix(in oklch, var(--primary) 6%, transparent);
+		box-shadow:
+			inset 0 0 0 1px color-mix(in oklch, var(--primary) 12%, transparent),
+			0 8px 24px rgba(0, 0, 0, 0.035);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.archive-entry {
+			transition: none;
+		}
+
+		.archive-entry:hover {
+			transform: none;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.archive-dashboard {
+			grid-template-columns: 1fr;
+		}
+
+		.archive-dashboard-stats {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+	}
+</style>
