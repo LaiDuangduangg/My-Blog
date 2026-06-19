@@ -44,8 +44,12 @@ const { remarkPluginFrontmatter } = await entry.render();
 ---
 <div class:list={["post-card card-base flex flex-col-reverse md:flex-col w-full rounded-[var(--radius-large)] overflow-hidden relative", className]} style={style}>
     <div class:list={["pl-6 md:pl-9 pr-6 md:pr-2 pt-6 md:pt-7 pb-6 relative", {"w-full md:w-[calc(100%_-_52px_-_12px)]": !hasCover, "w-full md:w-[calc(100%_-_var(--coverWidth)_-_12px)]": hasCover}]}>
+        <div class="post-card-kicker" aria-hidden="true">
+            <Icon name="material-symbols:article-outline-rounded" />
+            摘要卡
+        </div>
         <a href={url}
-           class="transition group w-full block font-bold mb-3 text-3xl text-90
+           class="post-card-title transition group w-full block font-bold mb-3 text-3xl text-90
         hover:text-[var(--primary)] dark:hover:text-[var(--primary)]
         active:text-[var(--title-active)] dark:active:text-[var(--title-active)]
         before:w-1 before:h-5 before:rounded-md before:bg-[var(--primary)]
@@ -60,7 +64,7 @@ const { remarkPluginFrontmatter } = await entry.render();
         <PostMetadata published={published} updated={updated} tags={tags} category={category} hideTagsForMobile={true} hideUpdateDate={true} class="mb-4"></PostMetadata>
 
         <!-- description -->
-        <div class:list={["post-description transition text-75 mb-3.5 pr-4", {"line-clamp-2 md:line-clamp-1": !description}]}>
+        <div class:list={["post-description transition text-75 mb-3.5 pr-4", {"line-clamp-2 md:line-clamp-2": !description}]}>
             { description || remarkPluginFrontmatter.excerpt }
         </div>
 
@@ -106,60 +110,19 @@ const { remarkPluginFrontmatter } = await entry.render();
 </div>
 <div class="transition border-t-[1px] border-dashed mx-6 border-black/10 dark:border-white/[0.15] last:border-t-0 md:hidden"></div>
 
-<script>
-const tiltMediaQuery = window.matchMedia("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)");
-
-function setupPostCardTilt() {
-	if (!tiltMediaQuery.matches) return;
-
-	document.querySelectorAll<HTMLElement>(".post-card:not([data-tilt-ready])").forEach((card) => {
-		card.setAttribute("data-tilt-ready", "true");
-
-		card.addEventListener("pointermove", (event) => {
-			const rect = card.getBoundingClientRect();
-			const x = (event.clientX - rect.left) / rect.width - 0.5;
-			const y = (event.clientY - rect.top) / rect.height - 0.5;
-
-			card.style.setProperty("--tilt-x", `${(-y * 5).toFixed(2)}deg`);
-			card.style.setProperty("--tilt-y", `${(x * 7).toFixed(2)}deg`);
-			card.style.setProperty("--shine-x", `${((x + 0.5) * 100).toFixed(1)}%`);
-			card.style.setProperty("--shine-y", `${((y + 0.5) * 100).toFixed(1)}%`);
-		});
-
-		card.addEventListener("pointerleave", () => {
-			card.style.setProperty("--tilt-x", "0deg");
-			card.style.setProperty("--tilt-y", "0deg");
-			card.style.setProperty("--shine-x", "50%");
-			card.style.setProperty("--shine-y", "50%");
-		});
-	});
-}
-
-setupPostCardTilt();
-
-if (window.swup?.hooks) {
-	window.swup.hooks.on("content:replace", setupPostCardTilt);
-} else {
-	document.addEventListener("swup:enable", () => {
-		window.swup?.hooks.on("content:replace", setupPostCardTilt);
-	}, { once: true });
-}
-</script>
-
 <style define:vars={{coverWidth}}>
 	.post-card {
 		isolation: isolate;
-		--tilt-x: 0deg;
-		--tilt-y: 0deg;
-		--shine-x: 50%;
-		--shine-y: 50%;
-		transform-style: preserve-3d;
-		will-change: transform;
+		border-color: color-mix(in oklch, var(--primary) 14%, transparent);
+		background:
+			linear-gradient(135deg, color-mix(in oklch, var(--card-bg) 96%, white), var(--card-bg));
+		box-shadow:
+			0 16px 42px rgba(0, 0, 0, 0.055),
+			inset 0 1px 0 rgba(255, 255, 255, 0.42);
 		transition:
 			transform 220ms ease,
 			box-shadow 220ms ease,
-			border-color 220ms ease,
-			background-color 220ms ease;
+			border-color 220ms ease;
 	}
 
 	.post-card::before {
@@ -169,6 +132,7 @@ if (window.swup?.hooks) {
 		z-index: 0;
 		opacity: 0;
 		background:
+			linear-gradient(90deg, color-mix(in oklch, var(--primary) 50%, white) 0 0.22rem, transparent 0.22rem),
 			radial-gradient(
 				circle at 18% 0%,
 				color-mix(in oklch, var(--primary) 14%, transparent),
@@ -179,23 +143,17 @@ if (window.swup?.hooks) {
 				color-mix(in oklch, var(--primary) 8%, transparent),
 				transparent 45%
 			);
-		transition: opacity 220ms ease;
+		transition: opacity 180ms ease;
 	}
 
 	.post-card::after {
 		content: "";
 		position: absolute;
-		inset: 0;
+		inset: auto 1.1rem 0;
 		z-index: 0;
-		pointer-events: none;
-		opacity: 0;
-		background: radial-gradient(
-			circle at var(--shine-x) var(--shine-y),
-			rgba(255, 255, 255, 0.24),
-			transparent 34%
-		);
-		mix-blend-mode: soft-light;
-		transition: opacity 180ms ease;
+		height: 1px;
+		background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--primary) 36%, transparent), transparent);
+		opacity: 0.7;
 	}
 
 	.post-card > * {
@@ -203,18 +161,57 @@ if (window.swup?.hooks) {
 	}
 
 	.post-card:hover {
-		transform: perspective(900px) translateY(-6px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
-		border-color: color-mix(in oklch, var(--primary) 28%, transparent);
+		transform: translateY(-5px);
+		border-color: color-mix(in oklch, var(--primary) 32%, transparent);
 		box-shadow:
-			0 18px 46px rgba(0, 0, 0, 0.075),
-			0 0 0 1px color-mix(in oklch, var(--primary) 10%, transparent);
+			0 20px 50px rgba(0, 0, 0, 0.09),
+			0 0 0 1px color-mix(in oklch, var(--primary) 12%, transparent);
+	}
+
+	.post-card-kicker {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		width: fit-content;
+		border: 1px solid color-mix(in oklch, var(--primary) 16%, transparent);
+		border-radius: 999px;
+		background: color-mix(in oklch, var(--primary) 6%, transparent);
+		padding: 0.22rem 0.55rem;
+		color: var(--primary);
+		font-size: 0.68rem;
+		font-weight: 950;
+		line-height: 1;
+		letter-spacing: 0;
+		margin-bottom: 0.7rem;
+	}
+
+	.post-card-kicker :global(svg) {
+		font-size: 0.95rem;
+	}
+
+	.post-card-title {
+		letter-spacing: 0;
+		line-height: 1.12;
+		max-width: 92%;
+	}
+
+	.post-description {
+		position: relative;
+		border-left: 2px solid color-mix(in oklch, var(--primary) 18%, transparent);
+		padding-left: 0.8rem;
+		line-height: 1.78;
+	}
+
+	.post-stats {
+		width: fit-content;
+		border: 1px solid color-mix(in oklch, var(--primary) 10%, transparent);
+		border-radius: 999px;
+		background: color-mix(in oklch, var(--card-bg) 72%, transparent);
+		padding: 0.32rem 0.65rem;
+		font-weight: 800;
 	}
 
 	.post-card:hover::before {
-		opacity: 1;
-	}
-
-	.post-card:hover::after {
 		opacity: 1;
 	}
 
@@ -238,14 +235,21 @@ if (window.swup?.hooks) {
 
 	:global(.dark) .post-card:hover {
 		box-shadow:
-			0 18px 46px rgba(0, 0, 0, 0.28),
+			0 22px 54px rgba(0, 0, 0, 0.34),
 			0 0 0 1px rgba(255, 255, 255, 0.08);
+	}
+
+	:global(.dark) .post-card {
+		background:
+			linear-gradient(135deg, color-mix(in oklch, var(--card-bg) 94%, white 4%), var(--card-bg));
+		box-shadow:
+			0 18px 48px rgba(0, 0, 0, 0.26),
+			inset 0 1px 0 rgba(255, 255, 255, 0.06);
 	}
 
 	@media (prefers-reduced-motion: reduce) {
 		.post-card,
 		.post-card::before,
-		.post-card::after,
 		.post-card :global(.meta-icon),
 		.post-stats,
 		.post-description {

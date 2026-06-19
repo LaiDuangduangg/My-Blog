@@ -159,6 +159,11 @@ const bannerOffset =
 		  data-overlayscrollbars-initialize
 	>
 		<ConfigCarrier></ConfigCarrier>
+		<div id="site-atmosphere" aria-hidden="true">
+			<div class="atmosphere-grid"></div>
+			<div class="atmosphere-sheen"></div>
+			<div class="atmosphere-grain"></div>
+		</div>
 		<div id="reading-progress" aria-hidden="true">
 			<div id="reading-progress-bar"></div>
 		</div>
@@ -176,6 +181,15 @@ const bannerOffset =
 }}>
 @tailwind components;
 @layer components {
+:root {
+	--motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+	--motion-ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+	--glass-border: color-mix(in oklch, var(--primary) 18%, transparent);
+	--glass-surface: color-mix(in oklch, var(--card-bg) 76%, transparent);
+	--soft-glow: color-mix(in oklch, var(--primary) 14%, transparent);
+}
+
+	.enable-banner.lg\:is-home #banner-wrapper,
 	.enable-banner.is-home #banner-wrapper {
 		@apply h-[var(--banner-height-home)] translate-y-[var(--banner-height-extend)]
 	}
@@ -183,18 +197,21 @@ const bannerOffset =
 		@apply h-[var(--banner-height-home)]
 	}
 
+	.enable-banner.lg\:is-home #banner,
 	.enable-banner.is-home #banner {
 		@apply h-[var(--banner-height-home)] translate-y-0
 	}
 	.enable-banner #banner {
 		@apply h-[var(--banner-height-home)] translate-y-[var(--bannerOffset)]
 	}
+	.enable-banner.lg\:is-home #main-grid,
 	.enable-banner.is-home #main-grid {
 		@apply translate-y-[var(--banner-height-extend)];
 	}
 	.enable-banner #top-row {
 		@apply h-[calc(var(--banner-height-home)_-_4.5rem)] transition-all duration-300
 	}
+	.enable-banner.lg\:is-home #sidebar-sticky,
 	.enable-banner.is-home #sidebar-sticky {
 		@apply top-[calc(1rem_-_var(--banner-height-extend))]
 	}
@@ -204,21 +221,103 @@ const bannerOffset =
 }
 
 body {
-	background-image: none;
+	background:
+		radial-gradient(circle at 9% 7%, color-mix(in oklch, var(--primary) 26%, transparent), transparent 28rem),
+		radial-gradient(circle at 88% 12%, rgba(42, 142, 255, 0.16), transparent 24rem),
+		radial-gradient(circle at 58% 62%, rgba(255, 185, 108, 0.12), transparent 28rem),
+		linear-gradient(
+			180deg,
+			color-mix(in oklch, var(--page-bg) 72%, oklch(0.92 0.06 215)) 0%,
+			color-mix(in oklch, var(--page-bg) 86%, oklch(0.97 0.04 35)) 42%,
+			var(--page-bg) 100%
+		);
+	background-attachment: scroll;
 }
 
 :root.dark body {
-	background-image: none;
+	background:
+		radial-gradient(circle at 12% 4%, color-mix(in oklch, var(--primary) 34%, transparent), transparent 28rem),
+		radial-gradient(circle at 86% 10%, rgba(29, 92, 180, 0.34), transparent 26rem),
+		radial-gradient(circle at 58% 62%, rgba(122, 72, 30, 0.18), transparent 28rem),
+		linear-gradient(
+			180deg,
+			color-mix(in oklch, var(--page-bg) 66%, oklch(0.16 0.055 240)) 0%,
+			color-mix(in oklch, var(--page-bg) 82%, oklch(0.18 0.045 25)) 54%,
+			var(--page-bg) 100%
+		);
+	background-attachment: scroll;
+}
+
+#site-atmosphere {
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	overflow: hidden;
+	pointer-events: none;
+	contain: paint;
+}
+
+#site-atmosphere > div {
+	position: absolute;
+	inset: 0;
+}
+
+.atmosphere-grid {
+	opacity: 0.34;
+	background-image:
+		linear-gradient(color-mix(in oklch, var(--primary) 24%, transparent) 1px, transparent 1px),
+		linear-gradient(90deg, color-mix(in oklch, var(--primary) 16%, transparent) 1px, transparent 1px);
+	background-size: 3.5rem 3.5rem;
+	mask-image: linear-gradient(to bottom, transparent 0%, black 14%, black 74%, transparent 100%);
+	transform: translate3d(-0.7rem, 0.4rem, 0);
+}
+
+.atmosphere-sheen {
+	opacity: 0.18;
+	background:
+		linear-gradient(
+			115deg,
+			transparent 0%,
+			transparent 39%,
+			rgba(255, 255, 255, 0.18) 47%,
+			transparent 58%,
+			transparent 100%
+		);
+	transform: translate3d(-18%, 0, 0);
+}
+
+.atmosphere-grain {
+	opacity: 0.08;
+	background-image:
+		repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.42) 0 1px, transparent 1px 7px),
+		repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.32) 0 1px, transparent 1px 9px);
+	mix-blend-mode: overlay;
+}
+
+:root.dark .atmosphere-grid {
+	opacity: 0.18;
+}
+
+:root.dark .atmosphere-sheen {
+	opacity: 0.1;
 }
 
 .card-base {
-	border: 1px solid color-mix(in oklch, var(--primary) 10%, transparent);
-	box-shadow: 0 10px 28px rgba(0, 0, 0, 0.028);
+	border: 1px solid var(--glass-border);
+	background:
+		linear-gradient(135deg, color-mix(in oklch, var(--card-bg) 93%, white), var(--card-bg));
+	box-shadow:
+		0 22px 58px rgba(0, 0, 0, 0.08),
+		inset 0 1px 0 rgba(255, 255, 255, 0.52);
 }
 
 :root.dark .card-base {
-	border-color: rgba(255, 255, 255, 0.06);
-	box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+	border-color: rgba(255, 255, 255, 0.1);
+	background:
+		linear-gradient(135deg, color-mix(in oklch, var(--card-bg) 90%, rgba(255, 255, 255, 0.06)), var(--card-bg));
+	box-shadow:
+		0 24px 68px rgba(0, 0, 0, 0.3),
+		inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
 #reading-progress {
@@ -227,7 +326,7 @@ body {
 	left: 0;
 	right: 0;
 	z-index: 90;
-	height: 3px;
+	height: 4px;
 	pointer-events: none;
 	background: color-mix(in oklch, var(--primary) 12%, transparent);
 	contain: layout paint style;
@@ -248,29 +347,53 @@ body {
 	box-shadow: 0 0 14px color-mix(in oklch, var(--primary) 45%, transparent);
 }
 
+#reading-progress::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background-image: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.48), transparent);
+	opacity: 0.55;
+}
+
+html.motion-ready .motion-reveal {
+	opacity: 0;
+	transform: translate3d(0, 1.35rem, 0) scale(0.985);
+	transition:
+		opacity 560ms var(--motion-ease-out),
+		transform 560ms var(--motion-ease-out);
+	transition-delay: var(--reveal-delay, 0ms);
+}
+
+html.motion-ready .motion-reveal.motion-visible {
+	opacity: 1;
+	transform: translate3d(0, 0, 0) scale(1);
+}
+
 html.is-changing .transition-swup-fade {
 	transition:
 		opacity 220ms ease,
-		transform 220ms ease,
-		filter 220ms ease;
+		transform 220ms ease;
 }
 
 html.is-animating .transition-swup-fade {
 	opacity: 0;
 	transform: translateY(0.75rem) scale(0.992);
-	filter: blur(3px);
 }
 
 @media (prefers-reduced-motion: reduce) {
+	#site-atmosphere *,
 	#reading-progress-bar,
+	html.motion-ready .motion-reveal,
 	html.is-changing .transition-swup-fade,
 	html.is-animating .transition-swup-fade {
+		animation: none;
 		transition: none;
 	}
 
+	html.motion-ready .motion-reveal,
 	html.is-changing .transition-swup-fade,
 	html.is-animating .transition-swup-fade {
-		filter: none;
+		opacity: 1;
 		transform: none;
 	}
 }
@@ -339,6 +462,7 @@ function disableAnimation() {
 */
 
 const bannerEnabled = !!document.getElementById('banner-wrapper')
+let revealObserver: IntersectionObserver | undefined;
 
 function setClickOutsideToClose(panel: string, ignores: string[]) {
 	document.addEventListener("click", event => {
@@ -390,6 +514,45 @@ function initCustomScrollbar() {
 	});
 }
 
+function initMotionReveal() {
+	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		return;
+	}
+
+	revealObserver?.disconnect();
+	document.documentElement.classList.add('motion-ready');
+
+	const targets = Array.from(document.querySelectorAll<HTMLElement>([
+		'.motion-reveal',
+		'#banner-credit',
+		'.post-card',
+		'.profile-card',
+		'widget-layout',
+		'.category-tree',
+		'.footer',
+	].join(','))).filter((element) => !element.closest('#navbar'));
+
+	revealObserver = new IntersectionObserver((entries) => {
+		entries.forEach((entry) => {
+			if (!entry.isIntersecting) return;
+			entry.target.classList.add('motion-visible');
+			revealObserver?.unobserve(entry.target);
+		});
+	}, {
+		rootMargin: '0px 0px -8% 0px',
+		threshold: 0.12,
+	});
+
+	targets.forEach((element, index) => {
+		if (element.classList.contains('motion-visible')) return;
+		element.classList.add('motion-reveal');
+		if (!element.style.getPropertyValue('--reveal-delay')) {
+			element.style.setProperty('--reveal-delay', `${Math.min(index % 8, 7) * 45}ms`);
+		}
+		revealObserver?.observe(element);
+	});
+}
+
 function showBanner() {
 	if (!siteConfig.banner.enable) return;
 
@@ -407,6 +570,7 @@ function init() {
 	loadTheme();
 	loadHue();
 	initCustomScrollbar();
+	initMotionReveal();
 	showBanner();
 }
 
@@ -445,6 +609,7 @@ const setup = () => {
 	})
 	window.swup.hooks.on('content:replace', () => {
 		initCustomScrollbar()
+		initMotionReveal()
 		refreshScrollElements()
 		queueRefreshScrollMetrics()
 	})

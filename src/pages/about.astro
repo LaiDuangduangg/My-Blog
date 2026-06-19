@@ -15,11 +15,31 @@ if (!aboutPost) {
 const { Content } = await render(aboutPost);
 ---
 <MainGridLayout title={i18n(I18nKey.about)} description={i18n(I18nKey.about)}>
-    <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
-        <div class="card-base z-10 px-9 py-6 relative w-full ">
+    <div class="about-shell flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32 motion-reveal" style="--reveal-delay: 120ms">
+        <div class="card-base z-10 px-9 py-6 relative w-full">
             <Markdown class="mt-2">
                 <Content />
             </Markdown>
         </div>
     </div>
 </MainGridLayout>
+
+<style>
+    .about-shell :global(.card-base) {
+        position: relative;
+        isolation: isolate;
+    }
+
+    .about-shell :global(.card-base)::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto;
+        z-index: -1;
+        height: 14rem;
+        background:
+            linear-gradient(90deg, color-mix(in oklch, var(--primary) 58%, white) 0 0.28rem, transparent 0.28rem),
+            radial-gradient(circle at 14% 0%, color-mix(in oklch, var(--primary) 18%, transparent), transparent 36%),
+            linear-gradient(180deg, color-mix(in oklch, var(--primary) 7%, transparent), transparent);
+        pointer-events: none;
+    }
+</style>

@@ -16,6 +16,8 @@ export type SiteConfig = {
 		| "tr"
 		| "id";
 
+	displayStats?: boolean;
+
 	themeColor: {
 		hue: number;
 		fixed: boolean;
