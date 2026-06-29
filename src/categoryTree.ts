@@ -103,14 +103,8 @@ export const categoryTree: TopCategory[] = [
 		knowledgePoints: [
 			{ name: "延迟操作", tags: ["优先队列", "延迟更新", "懒"] },
 			{ name: "双向链表", tags: ["双向链表"] },
-<<<<<<< HEAD
-			{ name: "维护第k大", tags: ["维护第k大"] },
-			{ name: "树状数组板子", tags: ["树状数组板子"] },
-			{ name: "树状数组", tags: ["树状数组"] },
-=======
 			{name :"维护第k大", tags: ['维护第k大']},
 			{name :"树状数组", tags: ["树状数组","树状数组板子"]},
->>>>>>> 5a49ad05cec6257a6990eb276ab38a96e959fa29
 		],
 	},
 	{
@@ -135,6 +129,7 @@ export const categoryTree: TopCategory[] = [
 		knowledgePoints: [
 			{ name: "异或前缀和", tags: ["异或前缀和"] },
 			{ name: "前缀和", tags: ["前缀和"] },
+			{ name : "二维后缀最大值", tags: ["二维后缀最大值"]},
 		],
 	},
 	{
@@ -145,14 +140,10 @@ export const categoryTree: TopCategory[] = [
 	{
 		name: "构造",
 		icon: "material-symbols:construction",
-<<<<<<< HEAD
-		knowledgePoints: [{ name: "可达性构造", tags: ["可达性构造"] }],
-=======
 		knowledgePoints: [
 			{ name: "可达性构造", tags: ["可达性构造"] },
 			{ name: "区间约束构造", tags: ["区间约束构造"]},
 		],
->>>>>>> 5a49ad05cec6257a6990eb276ab38a96e959fa29
 	},
 	{
 		name: "二分",
