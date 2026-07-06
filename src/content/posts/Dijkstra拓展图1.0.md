@@ -131,24 +131,13 @@ $$
 #include <bits/stdc++.h>
 using namespace std;
 
-<<<<<<< HEAD
-const int MAXN = 20;
-const int MAXM = 20;
-const int INF = 2e9;
-vector <vector <vector <int>>> grid (MAXN, vector <vector <int>> (MAXM, vector <int> (4, -1)));
-
-int dx[] = {1, 0, -1, 0};
-int dy[] = {0, 1, 0, -1};
-=======
 ## 题解思路
 
 ### 1. 分析题意
 
 这道题本质上是一道 **BFS 最短路**。
 
-普通 BFS 的状态一般只需要记录当前位置：
-
-    (x, y)
+普通 BFS 的状态一般只需要记录当前位置：(x, y)
 
 但是这道题不一样，因为走到某个位置时，能不能继续走，不仅取决于当前位置，还取决于当前手里有哪些钥匙。
 
@@ -520,7 +509,6 @@ int main ()
     return 0;
 }
 ```
->>>>>>> 5a49ad05cec6257a6990eb276ab38a96e959fa29
 
 int get_dir (int x1, int y1, int x2, int y2) {
     int gapx = x2 - x1;

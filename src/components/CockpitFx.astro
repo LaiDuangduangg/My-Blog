@@ -1,0 +1,321 @@
+---
+// Cockpit interactions: global keyboard shortcuts + a Matrix "code rain"
+// easter egg. Rendered once in the root Layout (outside the swup <main>),
+// so its window-level listeners survive client-side navigation.
+---
+
+<canvas id="cockpit-matrix" aria-hidden="true"></canvas>
+
+<!-- Shortcut cheatsheet, revealed with "?" -->
+<div id="cockpit-help" class="cockpit-help" aria-hidden="true">
+    <div class="cockpit-help-card">
+        <div class="cockpit-help-title">⌨ 键盘快捷键</div>
+        <ul>
+            <li><kbd>⌘</kbd>/<kbd>Ctrl</kbd> <kbd>K</kbd><span>命令面板</span></li>
+            <li><kbd>/</kbd><span>搜索题解</span></li>
+            <li><kbd>t</kbd><span>切换 日 / 夜</span></li>
+            <li><kbd>g</kbd> <kbd>h</kbd><span>回首页</span></li>
+            <li><kbd>g</kbd> <kbd>c</kbd><span>知识目录</span></li>
+            <li><kbd>g</kbd> <kbd>a</kbd><span>时间归档</span></li>
+            <li><kbd>j</kbd> / <kbd>k</kbd><span>向下 / 向上滚动</span></li>
+            <li><kbd>?</kbd><span>显示 / 隐藏本帮助</span></li>
+        </ul>
+        <div class="cockpit-help-hint">试试上古秘技：<span>↑ ↑ ↓ ↓ ← → ← → B A</span></div>
+    </div>
+</div>
+
+<style>
+    #cockpit-matrix {
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 700ms ease;
+    }
+
+    .cockpit-help {
+        position: fixed;
+        inset: 0;
+        z-index: 210;
+        display: grid;
+        place-items: center;
+        padding: 1rem;
+        background: rgba(8, 10, 18, 0.5);
+        backdrop-filter: blur(14px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 220ms ease;
+    }
+
+    .cockpit-help.open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .cockpit-help-card {
+        width: min(28rem, 100%);
+        border: 1px solid color-mix(in oklch, var(--primary) 34%, transparent);
+        border-radius: 1rem;
+        background: linear-gradient(180deg, oklch(0.2 0.022 var(--hue)), oklch(0.15 0.018 var(--hue)));
+        box-shadow:
+            0 26px 64px rgba(0, 0, 0, 0.45),
+            0 0 44px color-mix(in oklch, var(--primary) 22%, transparent);
+        padding: 1.25rem 1.35rem 1.1rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-family: var(--font-display, monospace);
+    }
+
+    .cockpit-help-title {
+        color: var(--primary);
+        font-weight: 800;
+        margin-bottom: 0.9rem;
+        text-shadow: 0 0 14px color-mix(in oklch, var(--primary) 55%, transparent);
+    }
+
+    .cockpit-help ul {
+        display: grid;
+        gap: 0.5rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .cockpit-help li {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .cockpit-help li span {
+        margin-left: auto;
+        color: rgba(255, 255, 255, 0.58);
+    }
+
+    .cockpit-help kbd {
+        display: inline-grid;
+        place-items: center;
+        min-width: 1.5rem;
+        height: 1.5rem;
+        padding: 0 0.4rem;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-bottom-width: 2px;
+        border-radius: 0.4rem;
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff;
+        font-family: var(--font-display, monospace);
+        font-size: 0.8rem;
+    }
+
+    .cockpit-help-hint {
+        margin-top: 1rem;
+        padding-top: 0.8rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.78rem;
+    }
+
+    .cockpit-help-hint span {
+        color: #35d07f;
+        letter-spacing: 0.05em;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        #cockpit-matrix { transition: none; }
+        .cockpit-help { transition: none; }
+    }
+</style>
+
+<script>
+(() => {
+    const w = window as unknown as { __cockpitFx?: boolean };
+    if (w.__cockpitFx) return;
+    w.__cockpitFx = true;
+
+    const prefersReduced = () =>
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const isTyping = (el: EventTarget | null) => {
+        const node = el as HTMLElement | null;
+        if (!node) return false;
+        const tag = node.tagName;
+        return (
+            tag === "INPUT" ||
+            tag === "TEXTAREA" ||
+            tag === "SELECT" ||
+            node.isContentEditable === true
+        );
+    };
+
+    const navigate = (path: string) => {
+        const swup = (window as unknown as { swup?: { navigate: (u: string) => void } }).swup;
+        if (swup && typeof swup.navigate === "function") swup.navigate(path);
+        else window.location.assign(path);
+    };
+
+    const openPalette = () => {
+        document.dispatchEvent(new CustomEvent("open-command-palette"));
+    };
+
+    const toggleTheme = () => {
+        const isDark = document.documentElement.classList.toggle("dark");
+        try {
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+        } catch (_) {}
+    };
+
+    const toggleHelp = (force?: boolean) => {
+        const help = document.getElementById("cockpit-help");
+        if (!help) return;
+        const willOpen = force ?? !help.classList.contains("open");
+        help.classList.toggle("open", willOpen);
+        help.setAttribute("aria-hidden", willOpen ? "false" : "true");
+    };
+
+    /* ---------------- Matrix "code rain" ---------------- */
+    let matrixRaf = 0;
+    const runMatrix = (duration = 4500) => {
+        const canvas = document.getElementById("cockpit-matrix") as HTMLCanvasElement | null;
+        if (!canvas) return;
+        if (prefersReduced()) {
+            // Respect the setting: a brief non-animated flash instead of motion.
+            canvas.style.opacity = "0.28";
+            setTimeout(() => (canvas.style.opacity = "0"), 400);
+            return;
+        }
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        if (matrixRaf) cancelAnimationFrame(matrixRaf);
+
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.scale(dpr, dpr);
+
+        const glyphs = "アイウエオカキクケコサシスセソ0123456789<>[]{}();=+*/&|".split("");
+        const fontSize = 16;
+        const columns = Math.ceil(width / fontSize);
+        const drops = new Array(columns).fill(0).map(() => Math.random() * -40);
+
+        canvas.style.opacity = "1";
+        const start = performance.now();
+
+        const draw = (now: number) => {
+            ctx.fillStyle = "rgba(6, 10, 12, 0.09)";
+            ctx.fillRect(0, 0, width, height);
+            ctx.font = `${fontSize}px "JetBrains Mono Variable", monospace`;
+
+            for (let i = 0; i < columns; i++) {
+                const ch = glyphs[(Math.random() * glyphs.length) | 0];
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+                // Bright head, softer trail
+                ctx.fillStyle = Math.random() > 0.975 ? "#d6fff0" : "#35d07f";
+                ctx.fillText(ch, x, y);
+                if (y > height && Math.random() > 0.975) drops[i] = 0;
+                drops[i] += 1;
+            }
+
+            const elapsed = now - start;
+            if (elapsed > duration) {
+                canvas.style.opacity = "0";
+                setTimeout(() => {
+                    cancelAnimationFrame(matrixRaf);
+                    matrixRaf = 0;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }, 720);
+                return;
+            }
+            matrixRaf = requestAnimationFrame(draw);
+        };
+        matrixRaf = requestAnimationFrame(draw);
+    };
+
+    document.addEventListener("cockpit-matrix", () => runMatrix());
+
+    /* ---------------- Konami code ---------------- */
+    const konami = [
+        "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown",
+        "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight",
+        "b", "a",
+    ];
+    let konamiIdx = 0;
+
+    /* ---------------- Global shortcuts ---------------- */
+    let gPending = false;
+    let gTimer = 0;
+
+    document.addEventListener("keydown", (event: KeyboardEvent) => {
+        // Konami: track regardless of focus (but ignore while typing)
+        if (!isTyping(event.target)) {
+            const expected = konami[konamiIdx];
+            const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+            if (key === expected) {
+                konamiIdx++;
+                if (konamiIdx === konami.length) {
+                    konamiIdx = 0;
+                    runMatrix();
+                    return;
+                }
+            } else {
+                konamiIdx = key === konami[0] ? 1 : 0;
+            }
+        }
+
+        if (event.defaultPrevented) return;
+        if (event.metaKey || event.ctrlKey || event.altKey) return; // leave ⌘K etc.
+        if (isTyping(event.target)) return;
+
+        const k = event.key;
+
+        if (gPending) {
+            gPending = false;
+            window.clearTimeout(gTimer);
+            if (k === "h") { event.preventDefault(); navigate("/"); return; }
+            if (k === "c") { event.preventDefault(); navigate("/catalog/"); return; }
+            if (k === "a") { event.preventDefault(); navigate("/archive/"); return; }
+        }
+
+        switch (k) {
+            case "/":
+                event.preventDefault();
+                openPalette();
+                break;
+            case "t":
+                event.preventDefault();
+                toggleTheme();
+                break;
+            case "?":
+                event.preventDefault();
+                toggleHelp();
+                break;
+            case "Escape":
+                toggleHelp(false);
+                break;
+            case "g":
+                gPending = true;
+                gTimer = window.setTimeout(() => (gPending = false), 800);
+                break;
+            case "j":
+                window.scrollBy({ top: 90, left: 0, behavior: "auto" });
+                break;
+            case "k":
+                window.scrollBy({ top: -90, left: 0, behavior: "auto" });
+                break;
+        }
+    });
+
+    // Close help when clicking the backdrop
+    document.addEventListener("click", (event) => {
+        const help = document.getElementById("cockpit-help");
+        if (help && help.classList.contains("open") && event.target === help) {
+            toggleHelp(false);
+        }
+    });
+})();
+</script>

@@ -4,9 +4,15 @@ import { Icon } from "astro-icon/components";
 
 <!-- There can't be a filter on parent element, or it will break `fixed` -->
 <div class="back-to-top-wrapper hidden lg:block">
-    <div id="back-to-top-btn" class="back-to-top-btn hide flex items-center rounded-2xl overflow-hidden transition" onclick="backToTop()">
-        <button aria-label="Back to Top" class="btn-card back-to-top-control h-[3.75rem] w-[3.75rem]">
-            <Icon name="material-symbols:keyboard-arrow-up-rounded" class="mx-auto"></Icon>
+    <div id="back-to-top-btn" class="back-to-top-btn hide flex items-center justify-center rounded-full overflow-visible transition" onclick="backToTop()">
+        <!-- Reading progress ring -->
+        <svg class="back-to-top-ring" viewBox="0 0 60 60" aria-hidden="true">
+            <circle class="ring-track" cx="30" cy="30" r="26" fill="none" stroke-width="2.5"></circle>
+            <circle id="back-to-top-ring" class="ring-progress" cx="30" cy="30" r="26" fill="none" stroke-width="2.5"
+                    stroke-linecap="round" pathLength="1"></circle>
+        </svg>
+        <button aria-label="Back to Top" class="btn-card back-to-top-control h-[3.75rem] w-[3.75rem] rounded-full">
+            <Icon name="material-symbols:keyboard-arrow-up-rounded" class="mx-auto arrow-icon"></Icon>
         </button>
     </div>
 </div>
@@ -32,6 +38,9 @@ import { Icon } from "astro-icon/components";
     cursor: pointer;
     transform: translateX(5rem);
     pointer-events: auto;
+    transition:
+        transform 520ms var(--motion-ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+        opacity 420ms ease;
 }
 
 .back-to-top-btn i {
@@ -44,29 +53,128 @@ import { Icon } from "astro-icon/components";
     pointer-events: none;
 }
 
-.back-to-top-btn:active {
-    transform: translateX(5rem) scale(0.9);
+/* Hover must NOT shift the button's hit area, or it jitters out from under
+   the cursor. Keep the resting translateX(5rem) and only change glow/scale. */
+.back-to-top-btn:active:not(.hide) {
+    transform: translateX(5rem) scale(0.92);
 }
 
 .back-to-top-control {
+    position: relative;
+    z-index: 1;
     border: 1px solid color-mix(in oklch, var(--primary) 18%, transparent);
     background: color-mix(in oklch, var(--card-bg) 72%, transparent);
     box-shadow:
         0 16px 38px rgba(0, 0, 0, 0.12),
         inset 0 1px 0 rgba(255, 255, 255, 0.32);
     backdrop-filter: blur(14px) saturate(1.12);
+    transition: box-shadow 320ms ease, background-color 320ms ease;
 }
 
-.back-to-top-control:hover {
+.back-to-top-btn:hover:not(.hide) .back-to-top-control {
+    background: color-mix(in oklch, var(--primary) 12%, var(--card-bg));
     box-shadow:
-        0 18px 46px color-mix(in oklch, var(--primary) 14%, transparent),
-        inset 0 1px 0 rgba(255, 255, 255, 0.38);
+        0 20px 50px color-mix(in oklch, var(--primary) 22%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.42);
 }
 
+.arrow-icon {
+    transition: transform 320ms var(--motion-ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.back-to-top-btn:hover:not(.hide) .arrow-icon {
+    transform: translateY(-2px);
+}
+
+/* Circular reading-progress ring wrapped around the button */
+.back-to-top-ring {
+    position: absolute;
+    inset: -3px;
+    width: calc(100% + 6px);
+    height: calc(100% + 6px);
+    transform: rotate(-90deg);
+    pointer-events: none;
+    z-index: 2;
+    overflow: visible;
+}
+
+.ring-track {
+    stroke: color-mix(in oklch, var(--primary) 14%, transparent);
+}
+
+.ring-progress {
+    stroke: var(--primary);
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 140ms linear;
+    filter: drop-shadow(0 0 4px color-mix(in oklch, var(--primary) 55%, transparent));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .back-to-top-btn,
+    .arrow-icon,
+    .ring-progress {
+        transition: none;
+    }
+}
 </style>
 
 <script is:raw is:inline>
-function backToTop() {
-    window.scroll({ top: 0, behavior: 'smooth' });
-}
+// Calm, eased scroll back to the top so the page settles instead of snapping.
+(function () {
+    let animating = 0;
+
+    function easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    window.backToTop = function backToTop() {
+        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const scrollElement = document.scrollingElement || document.documentElement;
+        const start = scrollElement.scrollTop || document.body.scrollTop || 0;
+
+        if (start <= 2) return;
+
+        if (prefersReduced) {
+            window.scrollTo(0, 0);
+            return;
+        }
+
+        if (animating) cancelAnimationFrame(animating);
+
+        // Scale duration with distance a little so short pages don't feel sluggish,
+        // but keep it unhurried overall (~0.65s-1.2s).
+        const duration = Math.min(1200, Math.max(650, start * 0.5));
+        const startedAt = performance.now();
+
+        const tick = function (now) {
+            const progress = Math.min((now - startedAt) / duration, 1);
+            const eased = easeInOutCubic(progress);
+            const top = Math.round(start * (1 - eased));
+            scrollElement.scrollTop = top;
+            document.documentElement.scrollTop = top;
+            document.body.scrollTop = top;
+
+            if (progress < 1) {
+                animating = requestAnimationFrame(tick);
+            } else {
+                animating = 0;
+            }
+        };
+
+        // Cancel the animation if the user starts scrolling manually.
+        const cancel = function () {
+            if (animating) {
+                cancelAnimationFrame(animating);
+                animating = 0;
+            }
+            window.removeEventListener('wheel', cancel);
+            window.removeEventListener('touchstart', cancel);
+        };
+        window.addEventListener('wheel', cancel, { passive: true, once: true });
+        window.addEventListener('touchstart', cancel, { passive: true, once: true });
+
+        animating = requestAnimationFrame(tick);
+    };
+})();
 </script>

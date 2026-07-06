@@ -1,0 +1,306 @@
+---
+import TagCloud from "@components/TagCloud.astro";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { TAG_DESCRIPTIONS } from "@/config/tag-families";
+import {
+	type TaggedTag,
+	getPostsByTag,
+	getRelatedTags,
+	getTagsDetailed,
+} from "@utils/tag-utils";
+import { formatDateToYYYYMMDD } from "@utils/date-utils";
+import { getPostUrlBySlug, getTagPageUrl } from "@utils/url-utils";
+import { Icon } from "astro-icon/components";
+
+export async function getStaticPaths() {
+	const tags = await getTagsDetailed();
+	return tags.map((tag) => ({
+		params: { tag: tag.name },
+		props: { tag },
+	}));
+}
+
+interface Props {
+	tag: TaggedTag;
+}
+
+const { tag } = Astro.props;
+const posts = await getPostsByTag(tag.name);
+const related = await getRelatedTags(tag.name);
+const description = TAG_DESCRIPTIONS[tag.name];
+
+// reuse the weighted cloud for related tags (size by co-occurrence weight)
+const relatedAsTags: TaggedTag[] = related.map((r) => ({
+	name: r.name,
+	count: r.weight,
+	family: r.family,
+}));
+---
+
+<MainGridLayout title={`#${tag.name}`}>
+	<div class="tag-page" style={`--fam-hue:${tag.family.hue}`}>
+		<section class="tag-hero card-base">
+			<a href={getTagPageUrl("")} class="tag-back">
+				<Icon name="material-symbols:arrow-back-rounded" />
+				标签中心
+			</a>
+			<div class="tag-family-badge">
+				<Icon name={tag.family.icon} />
+				{tag.family.name}
+			</div>
+			<h1><span class="hash">#</span>{tag.name}</h1>
+			<div class="tag-hero-meta">
+				<span><strong>{tag.count}</strong> 篇题解</span>
+				{related.length > 0 && <span><strong>{related.length}</strong> 个相关技术</span>}
+			</div>
+			{description && <p class="tag-desc">{description}</p>}
+		</section>
+
+		{related.length > 0 && (
+			<section class="tag-block card-base">
+				<div class="tag-block-title">
+					<Icon name="material-symbols:link-rounded" />
+					常一起出现的技术
+				</div>
+				<TagCloud tags={relatedAsTags} />
+			</section>
+		)}
+
+		<section class="tag-block card-base">
+			<div class="tag-block-title">
+				<Icon name="material-symbols:list-alt-outline-rounded" />
+				全部题解 · {posts.length}
+			</div>
+			<div class="tag-post-list">
+				{posts.map((post) => (
+					<a href={getPostUrlBySlug(post.slug)} class="tag-post">
+						<div class="tag-post-main">
+							<strong>{post.title}</strong>
+							<div class="tag-post-tags">
+								{post.tags
+									.filter((t) => t !== tag.name)
+									.slice(0, 5)
+									.map((t) => (
+										<span>#{t}</span>
+									))}
+							</div>
+						</div>
+						<div class="tag-post-side">
+							{post.category && <span class="tag-post-cat">{post.category}</span>}
+							<time>{formatDateToYYYYMMDD(post.published)}</time>
+						</div>
+					</a>
+				))}
+			</div>
+		</section>
+	</div>
+</MainGridLayout>
+
+<style>
+	.tag-page {
+		display: grid;
+		gap: 1rem;
+		color: rgba(0, 0, 0, 0.82);
+	}
+
+	:global(.dark) .tag-page {
+		color: rgba(255, 255, 255, 0.84);
+	}
+
+	.tag-hero,
+	.tag-block {
+		position: relative;
+		padding: 1.3rem 1.35rem;
+		overflow: hidden;
+	}
+
+	.tag-hero::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		background:
+			linear-gradient(90deg, oklch(0.7 0.16 var(--fam-hue)) 0 0.3rem, transparent 0.3rem),
+			radial-gradient(circle at 88% 0%, color-mix(in oklch, oklch(0.7 0.16 var(--fam-hue)) 20%, transparent), transparent 42%);
+		pointer-events: none;
+		opacity: 0.9;
+	}
+
+	.tag-hero > * {
+		position: relative;
+		z-index: 1;
+	}
+
+	.tag-back {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		color: color-mix(in oklch, currentColor 55%, transparent);
+		font-family: var(--font-display, monospace);
+		font-size: 0.82rem;
+		font-weight: 700;
+		transition: color 160ms ease;
+	}
+
+	.tag-back:hover {
+		color: var(--primary);
+	}
+
+	.tag-family-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		margin-top: 0.7rem;
+		padding: 0.28rem 0.6rem;
+		border: 1px solid color-mix(in oklch, oklch(0.7 0.16 var(--fam-hue)) 34%, transparent);
+		border-radius: 999px;
+		background: color-mix(in oklch, oklch(0.7 0.16 var(--fam-hue)) 10%, transparent);
+		color: oklch(0.6 0.16 var(--fam-hue));
+		font-family: var(--font-display, monospace);
+		font-size: 0.76rem;
+		font-weight: 800;
+	}
+
+	:global(.dark) .tag-family-badge {
+		color: oklch(0.78 0.16 var(--fam-hue));
+	}
+
+	.tag-hero h1 {
+		margin-top: 0.6rem;
+		font-family: var(--font-display, monospace);
+		font-size: clamp(2rem, 5vw, 3.2rem);
+		font-weight: 900;
+		line-height: 1.02;
+		word-break: break-word;
+	}
+
+	.tag-hero h1 .hash {
+		color: oklch(0.65 0.16 var(--fam-hue));
+		opacity: 0.7;
+	}
+
+	.tag-hero-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+		margin-top: 0.7rem;
+		font-family: var(--font-display, monospace);
+		font-size: 0.9rem;
+		color: color-mix(in oklch, currentColor 55%, transparent);
+	}
+
+	.tag-hero-meta strong {
+		color: var(--primary);
+		font-size: 1.1rem;
+	}
+
+	.tag-desc {
+		margin-top: 0.9rem;
+		padding: 0.75rem 0.9rem;
+		border-radius: 0.7rem;
+		border-left: 3px solid oklch(0.7 0.16 var(--fam-hue));
+		background: color-mix(in oklch, oklch(0.7 0.16 var(--fam-hue)) 7%, transparent);
+		line-height: 1.7;
+	}
+
+	.tag-block-title {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		margin-bottom: 0.9rem;
+		color: var(--primary);
+		font-family: var(--font-display, monospace);
+		font-weight: 800;
+		font-size: 0.95rem;
+	}
+
+	.tag-post-list {
+		display: grid;
+		gap: 0.5rem;
+	}
+
+	.tag-post {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		justify-content: space-between;
+		padding: 0.8rem 0.9rem;
+		border: 1px solid color-mix(in oklch, var(--primary) 12%, transparent);
+		border-radius: 0.75rem;
+		background: color-mix(in oklch, var(--card-bg) 62%, transparent);
+		transition:
+			transform 180ms var(--motion-ease-out, ease),
+			border-color 180ms ease,
+			box-shadow 180ms ease;
+	}
+
+	.tag-post:hover {
+		transform: translateX(4px);
+		border-color: color-mix(in oklch, var(--primary) 40%, transparent);
+		box-shadow: 0 10px 26px color-mix(in oklch, var(--primary) 14%, transparent);
+	}
+
+	.tag-post-main {
+		min-width: 0;
+	}
+
+	.tag-post-main strong {
+		display: block;
+		font-weight: 800;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.tag-post-tags {
+		margin-top: 0.28rem;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+		font-family: var(--font-display, monospace);
+		font-size: 0.72rem;
+		color: color-mix(in oklch, currentColor 40%, transparent);
+	}
+
+	.tag-post-side {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 0.25rem;
+		flex: 0 0 auto;
+		font-family: var(--font-display, monospace);
+		font-size: 0.76rem;
+		color: color-mix(in oklch, currentColor 45%, transparent);
+	}
+
+	.tag-post-cat {
+		color: var(--primary);
+		font-weight: 700;
+	}
+
+	.tag-post-side time {
+		font-variant-numeric: tabular-nums;
+	}
+
+	@media (max-width: 640px) {
+		.tag-post {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.5rem;
+		}
+		.tag-post-side {
+			flex-direction: row;
+			align-items: center;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.tag-post,
+		.tag-back {
+			transition: none;
+		}
+		.tag-post:hover {
+			transform: none;
+		}
+	}
+</style>

@@ -2,6 +2,7 @@
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
+import "@fontsource-variable/jetbrains-mono";
 import "../styles/variables.styl";
 import "../styles/main.css";
 import "../styles/transition.css";
@@ -9,7 +10,9 @@ import "../styles/scrollbar.css";
 import "../styles/markdown.css";
 import "../styles/markdown-extend.styl";
 import "../styles/expressive-code.css";
+import "../styles/cockpit.css";
 
+import CockpitFx from "@components/CockpitFx.astro";
 import ConfigCarrier from "@components/ConfigCarrier.astro";
 import { profileConfig, siteConfig } from "@/config";
 import {
@@ -41,6 +44,7 @@ let { title, banner, description, lang, setOGTypeArticle } = Astro.props;
 // Swup can update the body for each page visit, but it's after the page transition, causing a delay for banner height change
 // so use Swup hooks instead to change the height immediately when a link is clicked
 const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
+const isPostPage = Astro.url.pathname.startsWith(url("/posts/"));
 
 // defines global css variables
 // why doing this in Layout instead of GlobalStyles: https://github.com/withastro/astro/issues/6728#issuecomment-1502203757
@@ -135,8 +139,21 @@ const bannerOffset =
 					}
 			}
 
-			// Load the hue from local storage
-			const hue = localStorage.getItem('hue') || configHue;
+			// Load the hue from local storage.
+			// One-time migration to the redesigned signature accent: the previous
+			// default (25) was auto-persisted without the user ever choosing it, so
+			// adopt the new default once. Any intentionally customized hue is kept.
+			const HUE_VERSION = '2';
+			const LEGACY_DEFAULT_HUE = '25';
+			let hue = localStorage.getItem('hue');
+			if (localStorage.getItem('hue-version') !== HUE_VERSION) {
+				localStorage.setItem('hue-version', HUE_VERSION);
+				if (hue === null || hue === LEGACY_DEFAULT_HUE) {
+					hue = String(configHue);
+					localStorage.setItem('hue', hue);
+				}
+			}
+			if (hue === null) hue = String(configHue);
 			document.documentElement.style.setProperty('--hue', hue);
 
 			// calculate the --banner-height-extend, which needs to be a multiple of 4 to avoid blurry text
@@ -155,10 +172,11 @@ const bannerOffset =
 		<link rel="alternate" type="application/rss+xml" title={profileConfig.name} href={`${Astro.site}rss.xml`}/>
 
 	</head>
-	<body class=" min-h-screen transition " class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner}]}
+	<body class=" min-h-screen transition " class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner, "is-post-page": isPostPage}]}
 		  data-overlayscrollbars-initialize
 	>
 		<ConfigCarrier></ConfigCarrier>
+		<CockpitFx />
 		<div id="site-atmosphere" aria-hidden="true">
 			<div class="atmosphere-grid"></div>
 			<div class="atmosphere-sheen"></div>
@@ -221,29 +239,33 @@ const bannerOffset =
 }
 
 body {
+	/* Light mode: clean and bright for long reading, with a soft
+	   cyan/violet cockpit glow in the corners. */
 	background:
-		radial-gradient(circle at 9% 7%, color-mix(in oklch, var(--primary) 26%, transparent), transparent 28rem),
-		radial-gradient(circle at 88% 12%, rgba(42, 142, 255, 0.16), transparent 24rem),
-		radial-gradient(circle at 58% 62%, rgba(255, 185, 108, 0.12), transparent 28rem),
+		radial-gradient(circle at 8% 6%, color-mix(in oklch, var(--primary) 22%, transparent), transparent 30rem),
+		radial-gradient(circle at 92% 9%, color-mix(in oklch, var(--accent-2) 15%, transparent), transparent 26rem),
+		radial-gradient(circle at 60% 92%, color-mix(in oklch, var(--primary) 11%, transparent), transparent 32rem),
 		linear-gradient(
 			180deg,
-			color-mix(in oklch, var(--page-bg) 72%, oklch(0.92 0.06 215)) 0%,
-			color-mix(in oklch, var(--page-bg) 86%, oklch(0.97 0.04 35)) 42%,
+			color-mix(in oklch, var(--page-bg) 78%, white) 0%,
+			var(--page-bg) 58%,
 			var(--page-bg) 100%
 		);
 	background-attachment: scroll;
 }
 
 :root.dark body {
+	/* Dark "cockpit": deep ink base (not pure black) with cyan + violet
+	   neon glow at the top corners. */
 	background:
-		radial-gradient(circle at 12% 4%, color-mix(in oklch, var(--primary) 34%, transparent), transparent 28rem),
-		radial-gradient(circle at 86% 10%, rgba(29, 92, 180, 0.34), transparent 26rem),
-		radial-gradient(circle at 58% 62%, rgba(122, 72, 30, 0.18), transparent 28rem),
+		radial-gradient(circle at 10% 3%, color-mix(in oklch, var(--primary) 30%, transparent), transparent 30rem),
+		radial-gradient(circle at 90% 8%, color-mix(in oklch, var(--accent-2) 24%, transparent), transparent 28rem),
+		radial-gradient(circle at 55% 94%, color-mix(in oklch, var(--primary) 14%, transparent), transparent 34rem),
 		linear-gradient(
 			180deg,
-			color-mix(in oklch, var(--page-bg) 66%, oklch(0.16 0.055 240)) 0%,
-			color-mix(in oklch, var(--page-bg) 82%, oklch(0.18 0.045 25)) 54%,
-			var(--page-bg) 100%
+			oklch(0.155 0.02 var(--hue)) 0%,
+			oklch(0.14 0.018 var(--hue)) 55%,
+			oklch(0.13 0.016 var(--hue)) 100%
 		);
 	background-attachment: scroll;
 }
@@ -269,21 +291,35 @@ body {
 		linear-gradient(90deg, color-mix(in oklch, var(--primary) 16%, transparent) 1px, transparent 1px);
 	background-size: 3.5rem 3.5rem;
 	mask-image: linear-gradient(to bottom, transparent 0%, black 14%, black 74%, transparent 100%);
-	transform: translate3d(-0.7rem, 0.4rem, 0);
+	/* Slowly drift one cell so the cockpit grid feels alive (seamless loop). */
+	animation: atmo-grid-drift 26s linear infinite;
+}
+
+@keyframes atmo-grid-drift {
+	from { background-position: 0 0; }
+	to { background-position: 3.5rem 3.5rem; }
 }
 
 .atmosphere-sheen {
-	opacity: 0.18;
+	opacity: 0;
 	background:
 		linear-gradient(
 			115deg,
 			transparent 0%,
 			transparent 39%,
-			rgba(255, 255, 255, 0.18) 47%,
+			color-mix(in oklch, var(--primary) 26%, rgba(255, 255, 255, 0.2)) 47%,
 			transparent 58%,
 			transparent 100%
 		);
-	transform: translate3d(-18%, 0, 0);
+	/* A light bar sweeps across every ~15s — clearly visible, not distracting. */
+	animation: atmo-sweep 15s ease-in-out infinite;
+}
+
+@keyframes atmo-sweep {
+	0% { transform: translate3d(-32%, 0, 0); opacity: 0; }
+	40% { opacity: 0.16; }
+	60% { opacity: 0.16; }
+	100% { transform: translate3d(32%, 0, 0); opacity: 0; }
 }
 
 .atmosphere-grain {
@@ -295,11 +331,7 @@ body {
 }
 
 :root.dark .atmosphere-grid {
-	opacity: 0.18;
-}
-
-:root.dark .atmosphere-sheen {
-	opacity: 0.1;
+	opacity: 0.26;
 }
 
 .card-base {
@@ -378,6 +410,17 @@ html.is-changing .transition-swup-fade {
 html.is-animating .transition-swup-fade {
 	opacity: 0;
 	transform: translateY(0.75rem) scale(0.992);
+}
+
+/* Immersive full-width reading on post pages: drop the left sidebar and
+   let the article fill the whole content column (kept in sync by the
+   swup visit:start hook so client navigation matches the initial render). */
+body.is-post-page #sidebar {
+	display: none !important;
+}
+
+body.is-post-page #main-grid {
+	grid-template-columns: minmax(0, 1fr) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -463,6 +506,58 @@ function disableAnimation() {
 
 const bannerEnabled = !!document.getElementById('banner-wrapper')
 let revealObserver: IntersectionObserver | undefined;
+let routeScrollAnimation: number | undefined;
+
+function setPageScrollTop(top: number) {
+	const scrollElement = document.scrollingElement || document.documentElement;
+	scrollElement.scrollTop = top;
+	document.documentElement.scrollTop = top;
+	document.body.scrollTop = top;
+}
+
+function animateRouteScrollToTop() {
+	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		setPageScrollTop(0);
+		return;
+	}
+
+	if (routeScrollAnimation) {
+		cancelAnimationFrame(routeScrollAnimation);
+	}
+
+	const scrollElement = document.scrollingElement || document.documentElement;
+	const start = scrollElement.scrollTop || document.documentElement.scrollTop || document.body.scrollTop || 0;
+	if (start <= 2) return;
+
+	// Calmer, unhurried scroll-to-top on route change (eased in and out)
+	// so entering a post feels like settling in rather than snapping up.
+	const duration = Math.min(900, Math.max(520, start * 0.42));
+	const startedAt = performance.now();
+	const easeInOutCubic = (value: number) =>
+		value < 0.5 ? 4 * value * value * value : 1 - Math.pow(-2 * value + 2, 3) / 2;
+
+	const tick = (now: number) => {
+		const progress = Math.min((now - startedAt) / duration, 1);
+		setPageScrollTop(Math.round(start * (1 - easeInOutCubic(progress))));
+
+		if (progress < 1) {
+			routeScrollAnimation = requestAnimationFrame(tick);
+		} else {
+			routeScrollAnimation = undefined;
+		}
+	};
+
+	routeScrollAnimation = requestAnimationFrame(tick);
+}
+
+function finishRouteScrollToTop() {
+	if (routeScrollAnimation) {
+		cancelAnimationFrame(routeScrollAnimation);
+		routeScrollAnimation = undefined;
+	}
+
+	setPageScrollTop(0);
+}
 
 function setClickOutsideToClose(panel: string, ignores: string[]) {
 	document.addEventListener("click", event => {
@@ -591,6 +686,8 @@ const setup = () => {
 	})
 */
 	window.swup.hooks.on('link:click', () => {
+		animateRouteScrollToTop()
+
 		// Remove the delay for the first time page load
 		document.documentElement.style.setProperty('--content-delay', '0ms')
 
@@ -608,6 +705,7 @@ const setup = () => {
 		}
 	})
 	window.swup.hooks.on('content:replace', () => {
+		finishRouteScrollToTop()
 		initCustomScrollbar()
 		initMotionReveal()
 		refreshScrollElements()
@@ -620,6 +718,12 @@ const setup = () => {
 			bodyElement!.classList.add('lg:is-home');
 		} else {
 			bodyElement!.classList.remove('lg:is-home');
+		}
+		// Toggle the immersive full-width layout for post pages
+		if (visit.to.url.startsWith(url('/posts/'))) {
+			bodyElement!.classList.add('is-post-page');
+		} else {
+			bodyElement!.classList.remove('is-post-page');
 		}
 		queueRefreshScrollMetrics()
 
@@ -670,6 +774,7 @@ let backToTopBtn = document.getElementById('back-to-top-btn');
 let toc = document.getElementById('toc-wrapper');
 let navbar = document.getElementById('navbar-wrapper')
 let readingProgressBar = document.getElementById('reading-progress-bar');
+let readingProgressRing = document.getElementById('back-to-top-ring');
 let scrollTicking = false;
 let metricsTicking = false;
 let maxScrollableHeight = 1;
@@ -692,6 +797,7 @@ function refreshScrollElements() {
 	toc = document.getElementById('toc-wrapper');
 	navbar = document.getElementById('navbar-wrapper');
 	readingProgressBar = document.getElementById('reading-progress-bar');
+	readingProgressRing = document.getElementById('back-to-top-ring');
 }
 
 function refreshScrollMetrics() {
@@ -730,6 +836,13 @@ function updateReadingProgress() {
 
 	const progress = Math.min(getScrollTop() / maxScrollableHeight, 1);
 	readingProgressBar.style.transform = `scaleX(${progress})`;
+
+	if (!readingProgressRing) {
+		readingProgressRing = document.getElementById('back-to-top-ring');
+	}
+	if (readingProgressRing) {
+		readingProgressRing.style.strokeDashoffset = `${1 - progress}`;
+	}
 }
 function onScroll() {
 	if (scrollTicking) return;

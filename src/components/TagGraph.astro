@@ -1,0 +1,206 @@
+---
+import type { TagGraphData } from "@utils/tag-utils";
+import { getTagPageUrl } from "@utils/url-utils";
+
+interface Props {
+	data: TagGraphData;
+	class?: string;
+}
+
+const { data } = Astro.props;
+const className = Astro.props.class;
+
+function edgeOpacity(weight: number): number {
+	return 0.14 + 0.52 * (weight / data.maxWeight);
+}
+function edgeWidth(weight: number): number {
+	return 0.6 + (weight / data.maxWeight) * 2.4;
+}
+---
+
+<div class:list={["tag-graph", className]}>
+	{data.nodes.length === 0 ? (
+		<div class="tag-graph-empty">还没有足够的标签来生成关系图。</div>
+	) : (
+		<svg viewBox={`0 0 ${data.width} ${data.height}`} role="img" aria-label="标签共现关系图" preserveAspectRatio="xMidYMid meet">
+			<g class="edges" stroke-linecap="round">
+				{data.edges.map((e) => (
+					<line
+						data-a={e.a}
+						data-b={e.b}
+						x1={e.x1}
+						y1={e.y1}
+						x2={e.x2}
+						y2={e.y2}
+						style={`opacity:${edgeOpacity(e.weight).toFixed(3)};stroke-width:${edgeWidth(e.weight).toFixed(2)}`}
+					/>
+				))}
+			</g>
+			<g class="nodes">
+				{data.nodes.map((n) => (
+					<a href={getTagPageUrl(n.name)} class="graph-node" data-node={n.name} style={`--tag-hue:${n.hue}`}>
+						<circle cx={n.x} cy={n.y} r={n.r}></circle>
+						<text x={n.x} y={n.y - n.r - 6} text-anchor="middle">{n.name}</text>
+					</a>
+				))}
+			</g>
+		</svg>
+	)}
+</div>
+
+<style>
+	.tag-graph {
+		width: 100%;
+		overflow: hidden;
+		border-radius: 1rem;
+		border: 1px solid color-mix(in oklch, var(--primary) 16%, transparent);
+		background:
+			radial-gradient(circle at 50% 40%, color-mix(in oklch, var(--primary) 8%, transparent), transparent 70%),
+			color-mix(in oklch, var(--card-bg) 60%, transparent);
+	}
+
+	.tag-graph svg {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+
+	.tag-graph-empty {
+		padding: 2rem;
+		text-align: center;
+		color: color-mix(in oklch, var(--primary) 50%, gray);
+		font-family: var(--font-display, monospace);
+	}
+
+	.edges line {
+		stroke: color-mix(in oklch, var(--primary) 60%, transparent);
+		transition: opacity 200ms ease, stroke 200ms ease;
+	}
+
+	.edges line.edge-active {
+		stroke: var(--primary);
+		opacity: 0.95 !important;
+	}
+
+	.graph-node {
+		cursor: pointer;
+	}
+
+	.graph-node circle {
+		--c: oklch(0.7 0.16 var(--tag-hue));
+		fill: color-mix(in oklch, var(--c) 62%, transparent);
+		stroke: var(--c);
+		stroke-width: 1.5;
+		transition:
+			fill 200ms ease,
+			transform 200ms var(--motion-ease-out, ease),
+			filter 200ms ease;
+		transform-box: fill-box;
+		transform-origin: center;
+	}
+
+	.graph-node text {
+		fill: color-mix(in oklch, var(--primary) 65%, currentColor);
+		font-family: var(--font-display, monospace);
+		font-size: 11px;
+		font-weight: 700;
+		pointer-events: none;
+		opacity: 0.62;
+		transition: opacity 200ms ease, fill 200ms ease;
+	}
+
+	:global(.dark) .graph-node text {
+		fill: rgba(255, 255, 255, 0.66);
+	}
+
+	.graph-node:hover circle,
+	.graph-node.node-focus circle {
+		filter: drop-shadow(0 0 8px color-mix(in oklch, var(--c) 80%, transparent));
+		transform: scale(1.35);
+	}
+
+	.graph-node:hover text,
+	.graph-node.node-focus text {
+		opacity: 1;
+		fill: oklch(0.72 0.16 var(--tag-hue));
+	}
+
+	/* dim unrelated nodes while hovering one */
+	.tag-graph.is-hovering .graph-node.node-dim circle {
+		fill: color-mix(in oklch, var(--tag-hue) 8%, transparent);
+		stroke-opacity: 0.25;
+	}
+	.tag-graph.is-hovering .graph-node.node-dim text {
+		opacity: 0.15;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.graph-node circle,
+		.graph-node text,
+		.edges line {
+			transition: none;
+		}
+		.graph-node:hover circle {
+			transform: none;
+		}
+	}
+</style>
+
+<script>
+function initTagGraphs() {
+	const graphs = document.querySelectorAll<HTMLElement>(".tag-graph");
+	graphs.forEach((graph) => {
+		if (graph.dataset.bound === "1") return;
+		graph.dataset.bound = "1";
+
+		const nodes = Array.from(
+			graph.querySelectorAll<SVGGElement>(".graph-node"),
+		);
+		const lines = Array.from(graph.querySelectorAll<SVGLineElement>("line[data-a]"));
+
+		const clear = () => {
+			graph.classList.remove("is-hovering");
+			for (const l of lines) l.classList.remove("edge-active");
+			for (const n of nodes) n.classList.remove("node-dim", "node-focus");
+		};
+
+		const focus = (name: string) => {
+			graph.classList.add("is-hovering");
+			const connected = new Set<string>([name]);
+			for (const l of lines) {
+				const a = l.getAttribute("data-a");
+				const b = l.getAttribute("data-b");
+				if (a === name || b === name) {
+					l.classList.add("edge-active");
+					if (a) connected.add(a);
+					if (b) connected.add(b);
+				} else {
+					l.classList.remove("edge-active");
+				}
+			}
+			for (const n of nodes) {
+				const nn = n.getAttribute("data-node") || "";
+				n.classList.toggle("node-dim", !connected.has(nn));
+				n.classList.toggle("node-focus", nn === name);
+			}
+		};
+
+		for (const node of nodes) {
+			const name = node.getAttribute("data-node") || "";
+			node.addEventListener("mouseenter", () => focus(name));
+			node.addEventListener("focusin", () => focus(name));
+		}
+		graph.addEventListener("mouseleave", clear);
+	});
+}
+
+initTagGraphs();
+const w = window as unknown as { swup?: { hooks: { on: (e: string, cb: () => void) => void } } };
+if (w.swup?.hooks) {
+	w.swup.hooks.on("page:view", initTagGraphs);
+} else {
+	document.addEventListener("swup:enable", () => {
+		w.swup?.hooks.on("page:view", initTagGraphs);
+	});
+}
+</script>

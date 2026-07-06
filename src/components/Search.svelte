@@ -86,6 +86,21 @@ function togglePanel() {
 	openCommand();
 }
 
+function toggleTheme() {
+	const isDark = document.documentElement.classList.toggle("dark");
+	try {
+		localStorage.setItem("theme", isDark ? "dark" : "light");
+	} catch (_) {}
+	closeCommand();
+}
+
+function triggerMatrix() {
+	closeCommand();
+	setTimeout(() => {
+		document.dispatchEvent(new CustomEvent("cockpit-matrix"));
+	}, 120);
+}
+
 function handleGlobalKeydown(event: KeyboardEvent) {
 	const isCommandKey = event.ctrlKey || event.metaKey;
 	if (isCommandKey && event.key.toLowerCase() === "k") {
@@ -254,6 +269,26 @@ $: if (initialized && commandOpen) {
 				</section>
 
 				<section>
+					<div class="command-label">命令</div>
+					<div class="quick-grid">
+						<button type="button" class="quick-action command-action" on:click={toggleTheme}>
+							<Icon icon="material-symbols:dark-mode-outline-rounded" />
+							<div>
+								<strong>切换 日 / 夜</strong>
+								<span>亮色 ↔ 座舱暗色</span>
+							</div>
+						</button>
+						<button type="button" class="quick-action command-action" on:click={triggerMatrix}>
+							<Icon icon="material-symbols:water-drop-outline-rounded" />
+							<div>
+								<strong>代码雨</strong>
+								<span>来一阵 Matrix ✨</span>
+							</div>
+						</button>
+					</div>
+				</section>
+
+				<section>
 					<div class="command-label">搜索结果</div>
 					{#if isSearching}
 						<div class="command-empty">正在搜索...</div>
@@ -275,6 +310,13 @@ $: if (initialized && commandOpen) {
 						</div>
 					{/if}
 				</section>
+
+				<div class="command-foot">
+					<span><kbd>⌘</kbd><kbd>K</kbd> 命令面板</span>
+					<span><kbd>/</kbd> 搜索</span>
+					<span><kbd>t</kbd> 切换主题</span>
+					<span><kbd>?</kbd> 全部快捷键</span>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -418,6 +460,37 @@ $: if (initialized && commandOpen) {
 
 	.quick-action {
 		background: color-mix(in oklch, var(--primary) 6%, transparent);
+	}
+
+	.command-action {
+		width: 100%;
+		border: 0;
+		text-align: left;
+		font: inherit;
+		cursor: pointer;
+	}
+
+	.command-foot {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem 1rem;
+		padding-top: 0.35rem;
+		color: var(--command-text-30);
+		font-size: 0.76rem;
+	}
+
+	.command-foot kbd {
+		display: inline-grid;
+		place-items: center;
+		min-width: 1.2rem;
+		height: 1.2rem;
+		padding: 0 0.3rem;
+		margin-right: 0.15rem;
+		border: 1px solid color-mix(in oklch, var(--primary) 22%, transparent);
+		border-radius: 0.32rem;
+		background: color-mix(in oklch, var(--primary) 8%, transparent);
+		color: var(--command-text-75);
+		font-size: 0.72rem;
 	}
 
 	.quick-action:hover,

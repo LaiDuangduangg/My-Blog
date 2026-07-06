@@ -1,0 +1,103 @@
+---
+import type { TaggedTag } from "@utils/tag-utils";
+import { getTagPageUrl } from "@utils/url-utils";
+
+interface Props {
+	tags: TaggedTag[];
+	class?: string;
+}
+
+const { tags } = Astro.props;
+const className = Astro.props.class;
+
+const counts = tags.map((t) => t.count);
+const max = counts.length ? Math.max(...counts) : 1;
+const min = counts.length ? Math.min(...counts) : 1;
+const span = Math.max(1, max - min);
+
+function sizeRem(count: number): number {
+	const t = (count - min) / span;
+	return 0.82 + t * 0.85;
+}
+---
+
+<div class:list={["tag-cloud", className]}>
+	{tags.map((tag) => (
+		<a
+			href={getTagPageUrl(tag.name)}
+			class="tag-chip"
+			style={`--tag-hue:${tag.family.hue}; font-size:${sizeRem(tag.count).toFixed(3)}rem`}
+			aria-label={`标签 ${tag.name}，共 ${tag.count} 篇`}
+		>
+			<span class="tag-hash">#</span><span class="tag-name">{tag.name}</span>
+			<span class="tag-count">{tag.count}</span>
+		</a>
+	))}
+</div>
+
+<style>
+	.tag-cloud {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem 0.55rem;
+	}
+
+	.tag-chip {
+		--c: oklch(0.62 0.16 var(--tag-hue));
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.28rem;
+		padding: 0.32rem 0.7rem;
+		border: 1px solid color-mix(in oklch, var(--c) 32%, transparent);
+		border-radius: 999px;
+		background: color-mix(in oklch, var(--c) 8%, transparent);
+		color: color-mix(in oklch, var(--c) 72%, black);
+		font-family: var(--font-display, monospace);
+		font-weight: 700;
+		line-height: 1.2;
+		transition:
+			transform 200ms var(--motion-ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+			box-shadow 200ms ease,
+			border-color 200ms ease,
+			background-color 200ms ease;
+	}
+
+	:global(.dark) .tag-chip {
+		--c: oklch(0.74 0.16 var(--tag-hue));
+		color: color-mix(in oklch, var(--c) 88%, white);
+		background: color-mix(in oklch, var(--c) 12%, transparent);
+	}
+
+	.tag-hash {
+		color: var(--c);
+		opacity: 0.7;
+	}
+
+	.tag-count {
+		font-size: 0.7em;
+		padding: 0 0.34rem;
+		border-radius: 999px;
+		background: color-mix(in oklch, var(--c) 20%, transparent);
+		color: var(--c);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.tag-chip:hover {
+		transform: translateY(-2px);
+		border-color: color-mix(in oklch, var(--c) 60%, transparent);
+		background: color-mix(in oklch, var(--c) 16%, transparent);
+		box-shadow:
+			0 10px 26px color-mix(in oklch, var(--c) 22%, transparent),
+			0 0 0 1px color-mix(in oklch, var(--c) 34%, transparent);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.tag-chip {
+			transition: none;
+		}
+		.tag-chip:hover {
+			transform: none;
+		}
+	}
+</style>

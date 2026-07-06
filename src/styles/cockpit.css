@@ -1,0 +1,187 @@
+/* ============================================================
+   Cockpit theme layer
+   A "code cockpit" identity applied on top of Fuwari, tuned to
+   stay comfortable for long reading in BOTH light and dark mode.
+   - Monospace display type on the UI chrome (not the article body)
+   - Neon cyan accent (+ violet duotone glow)
+   - Terminal touches (blinking cursor, prompts)
+   ============================================================ */
+
+:root {
+	--font-display: "JetBrains Mono Variable", ui-monospace, SFMono-Regular,
+		Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+	/* Secondary duotone accent (violet) for glows and gradients */
+	--accent-2: oklch(0.68 0.15 300);
+	--accent-glow: color-mix(in oklch, var(--primary) 45%, transparent);
+}
+
+:root.dark {
+	--accent-2: oklch(0.72 0.17 300);
+	--accent-glow: color-mix(in oklch, var(--primary) 60%, transparent);
+}
+
+/* ---- Monospace display type on the UI "chrome" -------------------
+   Latin/digits render in JetBrains Mono; CJK gracefully falls back to
+   the system CJK font, giving a clean mixed technical look without
+   hurting Chinese legibility. The article body stays in Roboto. */
+.home-console h1,
+.home-kicker,
+.home-panel-title,
+.home-console-stats strong,
+.home-console-stats span,
+.nav-brand,
+.nav-link,
+.post-card-title,
+.post-card-kicker,
+#post-container .post-title,
+.post-title-label,
+.post-topline,
+.side-control-title,
+.side-control-grid a,
+.profile-status,
+.profile-card .font-bold,
+.category-meter strong,
+.tag-strip a,
+.home-action,
+.latest-item span,
+table-of-contents,
+.pagination-link {
+	font-family: var(--font-display);
+	letter-spacing: -0.01em;
+}
+
+/* Tabular numerals so stats/line numbers line up like a console readout */
+.home-console-stats strong,
+.category-meter strong,
+.latest-item span {
+	font-variant-numeric: tabular-nums;
+	font-feature-settings: "tnum" 1;
+}
+
+/* ---- Terminal cursor on the homepage headline ---- */
+.home-console h1 {
+	position: relative;
+}
+
+.home-console h1::after {
+	content: "▍";
+	margin-left: 0.12em;
+	color: var(--primary);
+	font-weight: 400;
+	animation: cockpit-blink 1.15s steps(1, end) infinite;
+	text-shadow: 0 0 12px var(--accent-glow);
+}
+
+@keyframes cockpit-blink {
+	0%,
+	50% {
+		opacity: 1;
+	}
+	50.01%,
+	100% {
+		opacity: 0;
+	}
+}
+
+/* Kicker reads like a shell path */
+.home-kicker,
+.home-panel-title,
+.post-card-kicker,
+.side-control-title,
+.post-title-label {
+	text-transform: none;
+}
+
+/* ---- Neon-tinted glass cards ---- */
+.card-base {
+	border-color: color-mix(in oklch, var(--primary) 20%, var(--glass-border));
+}
+
+:root.dark .card-base {
+	border-color: color-mix(in oklch, var(--primary) 24%, rgba(255, 255, 255, 0.08));
+}
+
+/* Interactive summary cards get a lift + neon halo on hover */
+.post-card {
+	transition:
+		transform 260ms var(--motion-ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+		border-color 260ms ease,
+		box-shadow 260ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.post-card:hover {
+		transform: translateY(-3px);
+		border-color: color-mix(in oklch, var(--primary) 42%, transparent);
+		box-shadow:
+			0 26px 60px rgba(0, 0, 0, 0.14),
+			0 0 0 1px color-mix(in oklch, var(--primary) 26%, transparent),
+			0 10px 40px color-mix(in oklch, var(--primary) 16%, transparent);
+	}
+
+	:root.dark .post-card:hover {
+		box-shadow:
+			0 26px 66px rgba(0, 0, 0, 0.42),
+			0 0 0 1px color-mix(in oklch, var(--primary) 34%, transparent),
+			0 12px 46px color-mix(in oklch, var(--primary) 26%, transparent);
+	}
+}
+
+/* ---- Neon accents on key labels ---- */
+.home-console-stats strong {
+	text-shadow: 0 0 18px var(--accent-glow);
+}
+
+.profile-status span {
+	box-shadow: 0 0 14px var(--primary);
+	animation: cockpit-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes cockpit-pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.45;
+	}
+}
+
+/* ---- Section headings inside articles get a subtle neon marker ----
+   (Latin stays mono-flavored via the primary bar; body text untouched.) */
+#post-container .markdown-content :is(h1, h2, h3) {
+	letter-spacing: -0.005em;
+}
+
+/* ---- TOC: console-style active glow ---- */
+table-of-contents a.visible {
+	box-shadow: 0 0 0 1px color-mix(in oklch, var(--primary) 26%, transparent);
+}
+
+table-of-contents a.visible > div:last-child {
+	text-shadow: 0 0 12px var(--accent-glow);
+}
+
+#active-indicator {
+	box-shadow: 0 0 16px color-mix(in oklch, var(--primary) 22%, transparent);
+}
+
+/* ---- Nav brand: monospace with a soft neon glow on the title ---- */
+.nav-brand .flex {
+	text-shadow: 0 0 14px color-mix(in oklch, var(--primary) 30%, transparent);
+}
+
+/* ---- Selection uses the accent so highlights read as "terminal select" ---- */
+::selection {
+	background-color: color-mix(in oklch, var(--primary) 30%, transparent);
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+	.home-console h1::after,
+	.profile-status span,
+	.post-card {
+		animation: none;
+		transition: none;
+	}
+}

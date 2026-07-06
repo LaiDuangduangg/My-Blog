@@ -1,13 +1,16 @@
 .expressive-code {
     .frame {
-        @apply !shadow-none;
         border-radius: 1rem !important;
+        border: 1px solid color-mix(in oklch, var(--primary) 20%, transparent) !important;
         background:
             linear-gradient(135deg, color-mix(in oklch, var(--codeblock-bg) 92%, white 3%), var(--codeblock-bg)) !important;
+        box-shadow:
+            0 0 0 1px color-mix(in oklch, var(--primary) 8%, transparent),
+            0 12px 30px rgba(0, 0, 0, 0.28) !important;
         transition:
-            border-color 180ms ease,
-            box-shadow 180ms ease,
-            transform 180ms ease;
+            border-color 200ms ease,
+            box-shadow 200ms ease,
+            transform 200ms ease;
     }
 
     .frame::before {
@@ -32,8 +35,12 @@
 
     @media (hover: hover) and (pointer: fine) {
     .frame:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.13) !important;
+        transform: translateY(-2px);
+        border-color: color-mix(in oklch, var(--primary) 30%, transparent) !important;
+        box-shadow:
+            0 18px 40px rgba(0, 0, 0, 0.16),
+            0 0 0 1px color-mix(in oklch, var(--primary) 22%, transparent),
+            0 6px 26px color-mix(in oklch, var(--primary) 16%, transparent) !important;
     }
     }
 

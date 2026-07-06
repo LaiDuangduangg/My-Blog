@@ -21,6 +21,12 @@ export function getTagUrl(tag: string): string {
 	return url(`/archive/?tag=${encodeURIComponent(tag.trim())}`);
 }
 
+// Dedicated per-tag page in the Tag Hub (richer than the archive filter).
+export function getTagPageUrl(tag: string): string {
+	if (!tag) return url("/tags/");
+	return url(`/tags/${encodeURIComponent(tag.trim())}/`);
+}
+
 export function getCategoryUrl(category: string | null): string {
 	if (
 		!category ||

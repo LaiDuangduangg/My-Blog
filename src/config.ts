@@ -12,7 +12,7 @@ export const siteConfig: SiteConfig = {
 	lang: 'zh_CN', // Language code, e.g. 'en', 'zh_CN', 'ja', etc.
 	displayStats: true,
 	themeColor: {
-		hue: 25, // Default hue for the theme color, from 0 to 360. e.g. red: 0, teal: 200, cyan: 250, pink: 345
+		hue: 195, // Neon cyan-teal — the "code cockpit" accent. 0-360. e.g. red: 0, teal: 200, cyan: 250, pink: 345
 		fixed: false, // Hide the theme color picker for visitors
 	},
 	banner: {
@@ -43,6 +43,7 @@ export const navBarConfig: NavBarConfig = {
 	links: [
     { name: '首页', url: '/' },       // 把 Home 改成 首页
     { name: '目录', url: '/catalog/' }, // 知识点目录树
+    { name: '标签', url: '/tags/' },   // 标签中心（技能树 + 关系图）
     { name: '归档', url: '/archive/' }, // 把 Archive 改成 归档
     { name: '关于', url: '/about/' },   // 把 About 改成 关于
   ],
