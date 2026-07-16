@@ -62,7 +62,14 @@ export const categoryTree: TopCategory[] = [
 		name: "图论",
 		icon: "material-symbols:hub-outline",
 		knowledgePoints: [
-			{ name: "树上问题", tags: ["LCA", "树形图"] },
+			{  	
+				name: "树", 
+				tags: ["LCA"], 
+				children :[
+					{name : "k进制树,隐式树",	tags: ["隐式树, k进制树"]},
+					{name : "倍增LCA", tags: ["倍增LCA"]},
+				],
+			},
 			{
 				name: "BFS",
 				tags: ["BFS"],
@@ -95,6 +102,7 @@ export const categoryTree: TopCategory[] = [
 					// 想再细分？直接在上面那行的 `}` 前面加 children: [...]，无限嵌套
 				],
 			},
+			{name: "数位DP", tags: ["数位DP"]},
 		],
 	},
 	{

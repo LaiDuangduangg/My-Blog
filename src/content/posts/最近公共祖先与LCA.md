@@ -2,7 +2,7 @@
 title: 快速求树上距离
 published: 2026-04-09
 category: 算法竞赛
-tags: [C++, 图论, LCA, 倍增]
+tags: [C++, 图论, 倍增LCA]
 ---
 
 
