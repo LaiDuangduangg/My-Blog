@@ -138,6 +138,7 @@ export const categoryTree: TopCategory[] = [
 			{ name: "异或前缀和", tags: ["异或前缀和"] },
 			{ name: "前缀和", tags: ["前缀和"] },
 			{ name : "二维后缀最大值", tags: ["二维后缀最大值"]},
+			{ name : "高维前缀和", tags : ["高维前缀和"]},
 		],
 	},
 	{
