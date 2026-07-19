@@ -177,6 +177,10 @@ export const categoryTree: TopCategory[] = [
 				name: "回文数 / 进制 / 高精度",
 				tags: ["回文数", "进制转化", "高精度"],
 			},
+			{
+				name: "逆序处理",
+				tags : ["逆序处理"],
+			},
 		],
 	},
 ];
