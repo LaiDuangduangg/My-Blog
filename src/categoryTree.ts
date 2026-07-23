@@ -129,6 +129,7 @@ export const categoryTree: TopCategory[] = [
 			{ name: "快速幂", tags: ["快速幂"] },
 			{ name: "公式变换 / 容斥", tags: ["公式变换", "斥容原理"] },
 			{ name: "数论分块", tags: ["数论分块"] },
+			{ name: "线性基", tags : ["线性基"]},
 		],
 	},
 	{
