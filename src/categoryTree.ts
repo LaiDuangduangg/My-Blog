@@ -113,6 +113,7 @@ export const categoryTree: TopCategory[] = [
 			{ name: "双向链表", tags: ["双向链表"] },
 			{name :"维护第k大", tags: ['维护第k大']},
 			{name :"树状数组", tags: ["树状数组","树状数组板子"]},
+			{name : "线段树", tags : ["线段树"]},
 		],
 	},
 	{
@@ -169,6 +170,19 @@ export const categoryTree: TopCategory[] = [
 		knowledgePoints: [
 			// 以后写到组合数学相关的题再补
 			{ name: "隔板法/插板法", tags: ["隔板法", "插板法"] },
+		],
+	},
+	{
+		name: "博弈论",
+		icon: "material-symbols:casino-outline",
+		knowledgePoints: [
+			{
+			name: "单调量 / 奇偶博弈",
+			tags: ["不变量博弈", "奇偶博弈"],
+			children: [
+					{ name: "树上博弈", tags: ["树上博弈"] },
+				],
+			},
 		],
 	},
 	{
