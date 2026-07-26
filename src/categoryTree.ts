@@ -113,7 +113,13 @@ export const categoryTree: TopCategory[] = [
 			{ name: "双向链表", tags: ["双向链表"] },
 			{name :"维护第k大", tags: ['维护第k大']},
 			{name :"树状数组", tags: ["树状数组","树状数组板子"]},
-			{name : "线段树", tags : ["线段树"]},
+			{name : "线段树", 
+				tags : ["线段树"],
+				children : [
+					{name : "线段树基础模板", tags : ["线段树基础模板"]},
+					{name : "线段树经典变种", tags : ["线段树经典变种"]},
+				],
+			},
 		],
 	},
 	{
