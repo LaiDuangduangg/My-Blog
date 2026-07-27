@@ -117,7 +117,7 @@ export const categoryTree: TopCategory[] = [
 				tags : ["线段树"],
 				children : [
 					{name : "线段树基础模板", tags : ["线段树基础模板"]},
-					{name : "线段树经典变种", tags : ["线段树经典变种"]},
+					{name : "线段树经典", tags : ["线段树经典"]},
 				],
 			},
 		],
