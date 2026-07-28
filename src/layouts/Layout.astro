@@ -611,6 +611,8 @@ function initCustomScrollbar() {
 
 function initMotionReveal() {
 	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		revealObserver?.disconnect();
+		document.documentElement.classList.remove('motion-ready');
 		return;
 	}
 
@@ -626,6 +628,7 @@ function initMotionReveal() {
 		'.category-tree',
 		'.footer',
 	].join(','))).filter((element) => !element.closest('#navbar'));
+	const immediateTargets: HTMLElement[] = [];
 
 	revealObserver = new IntersectionObserver((entries) => {
 		entries.forEach((entry) => {
@@ -644,8 +647,24 @@ function initMotionReveal() {
 		if (!element.style.getPropertyValue('--reveal-delay')) {
 			element.style.setProperty('--reveal-delay', `${Math.min(index % 8, 7) * 45}ms`);
 		}
+		if (element.hasAttribute('data-motion-immediate')) {
+			immediateTargets.push(element);
+			return;
+		}
 		revealObserver?.observe(element);
 	});
+
+	if (immediateTargets.length > 0) {
+		requestAnimationFrame(() => {
+			requestAnimationFrame(() => {
+				immediateTargets.forEach((element) => {
+					if (element.isConnected) {
+						element.classList.add('motion-visible');
+					}
+				});
+			});
+		});
+	}
 }
 
 function showBanner() {
