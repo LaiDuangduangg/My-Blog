@@ -103,6 +103,10 @@ export const categoryTree: TopCategory[] = [
 				],
 			},
 			{name: "数位DP", tags: ["数位DP"]},
+			{
+				name: "状压DP",
+				tags: ["状压DP"],
+			},
 		],
 	},
 	{
