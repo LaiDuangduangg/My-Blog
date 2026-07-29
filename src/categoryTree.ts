@@ -137,7 +137,7 @@ export const categoryTree: TopCategory[] = [
 			{ name: "公式变换 / 容斥", tags: ["公式变换", "斥容原理"] },
 			{ name: "数论分块", tags: ["数论分块"] },
 			{ name: "线性基", tags : ["线性基"]},
-			{ name: "二进制操作集合", tags : ["二进制操作"]},
+			{ name: "二进制操作集合", tags : ["二进制操作集合"]},
 		],
 	},
 	{
