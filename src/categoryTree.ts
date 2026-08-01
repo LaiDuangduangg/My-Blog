@@ -193,6 +193,10 @@ export const categoryTree: TopCategory[] = [
 					{ name: "树上博弈", tags: ["树上博弈"] },
 				],
 			},
+			{
+			name: "配对策略",
+			tags: ["配对策略"],
+			},
 		],
 	},
 	{
