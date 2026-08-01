@@ -2,7 +2,7 @@
 title: X to Y(1.0)
 published: 2026-07-17
 category: 算法竞赛
-tags: [C++, k进制数,隐式树]
+tags: [C++, 隐式树, k进制树]
 ---
 
 ## 问题描述

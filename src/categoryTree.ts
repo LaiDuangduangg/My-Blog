@@ -64,9 +64,9 @@ export const categoryTree: TopCategory[] = [
 		knowledgePoints: [
 			{  	
 				name: "树", 
-				tags: ["LCA"], 
+				tags: ["树"], 
 				children :[
-					{name : "k进制树,隐式树",	tags: ["隐式树, k进制树"]},
+					{name : "k进制树,隐式树",	tags: ["隐式树", "k进制树"]},
 					{name : "倍增LCA", tags: ["倍增LCA"]},
 				],
 			},
