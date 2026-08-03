@@ -99,7 +99,6 @@ export const categoryTree: TopCategory[] = [
 				children: [
 					// 想在「计数 DP」里再开一个子展开列表，就这样写：
 					{ name: "子序列计数 DP", tags: ["子序列计数DP"] },
-					{ name: "放置计数 DP", tags: ["放置计数DP"] },
 					// 想再细分？直接在上面那行的 `}` 前面加 children: [...]，无限嵌套
 				],
 			},

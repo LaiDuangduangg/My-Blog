@@ -1,8 +1,8 @@
 ---
-title: Redistribution (1.0)
+title: Redistribution (2.0)
 published: 2026-08-03
 category: 算法竞赛
-tags: [C++, 有序组成计数DP]
+tags: [C++, 计数DP]
 ---
 
 # Redistribution
