@@ -103,10 +103,17 @@ export const categoryTree: TopCategory[] = [
 					// 想再细分？直接在上面那行的 `}` 前面加 children: [...]，无限嵌套
 				],
 			},
-			{name: "数位DP", tags: ["数位DP"]},
+			{	
+				name: "数位DP", 
+				tags: ["数位DP"]
+			},
 			{
 				name: "状压DP",
 				tags: ["状压DP"],
+			},
+			{
+				name: "换根DP",
+				tags: ["换根DP"],
 			},
 		],
 	},
