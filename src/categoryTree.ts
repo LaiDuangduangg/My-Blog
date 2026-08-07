@@ -148,7 +148,37 @@ export const categoryTree: TopCategory[] = [
 		name: "字符串",
 		icon: "material-symbols:abc",
 		knowledgePoints: [
-			{ name: "子序列自动机", tags: ["子序列自动机", "字符串"] },
+			{ 	name: "子序列自动机", 
+				tags: ["子序列自动机"]
+			},
+			{
+				name : "Z函数",
+				tags: ["Z函数"]
+			},
+			{
+				name: "Manacher",
+				tags: ["Manacher"]	
+			},
+			{
+				name: "01-Trie",
+				tags: ["01-Trie"]
+			},
+			{
+				name: "字符串哈希",
+				tags: ["字符串哈希"]
+			},
+			{
+				name: "最小表示法",
+				tags: ["最小表示法"]
+			},
+			{
+				name: "AC 自动机",
+				tags: ["AC 自动机"]
+			},
+			{
+				name: "KMP 自动机",
+				tags: ["KMP 自动机"]
+			},
 		],
 	},
 	{
