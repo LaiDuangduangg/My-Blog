@@ -86,8 +86,14 @@ export const categoryTree: TopCategory[] = [
 		name: "动态规划",
 		icon: "material-symbols:auto-graph",
 		knowledgePoints: [
-			{ name: "值域 DP", tags: ["值域dp"] },
-			{ name: "树形 DP", tags: ["树形DP", "树上背包"] },
+			{ 	name: "值域 DP",
+				tags: ["值域dp"] 
+
+			},
+			{ 	name: "树形 DP",
+				tags: ["树形DP", "树上背包"] 
+
+			},
 			{
 				name: "线性 DP",
 				tags: ["线性DP"],
@@ -114,6 +120,10 @@ export const categoryTree: TopCategory[] = [
 			{
 				name: "换根DP",
 				tags: ["换根DP"],
+			},
+			{
+				name : "区间DP",
+				tags: ["区间DP"]
 			},
 		],
 	},
