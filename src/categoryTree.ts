@@ -62,12 +62,12 @@ export const categoryTree: TopCategory[] = [
 		name: "图论",
 		icon: "material-symbols:hub-outline",
 		knowledgePoints: [
-			{  	
-				name: "树", 
-				tags: ["树"], 
-				children :[
-					{name : "k进制树,隐式树",	tags: ["隐式树", "k进制树"]},
-					{name : "倍增LCA", tags: ["倍增LCA"]},
+			{
+				name: "树",
+				tags: ["树"],
+				children: [
+					{ name: "k进制树,隐式树", tags: ["隐式树", "k进制树"] },
+					{ name: "倍增LCA", tags: ["倍增LCA"] },
 				],
 			},
 			{
@@ -86,14 +86,8 @@ export const categoryTree: TopCategory[] = [
 		name: "动态规划",
 		icon: "material-symbols:auto-graph",
 		knowledgePoints: [
-			{ 	name: "值域 DP",
-				tags: ["值域dp"] 
-
-			},
-			{ 	name: "树形 DP",
-				tags: ["树形DP", "树上背包"] 
-
-			},
+			{ name: "值域 DP", tags: ["值域dp"] },
+			{ name: "树形 DP", tags: ["树形DP", "树上背包"] },
 			{
 				name: "线性 DP",
 				tags: ["线性DP"],
@@ -105,13 +99,13 @@ export const categoryTree: TopCategory[] = [
 				children: [
 					// 想在「计数 DP」里再开一个子展开列表，就这样写：
 					{ name: "子序列计数 DP", tags: ["子序列计数DP"] },
-					{ name: "放置计数DP", tags : ["放置计数DP"]},
+					{ name: "放置计数DP", tags: ["放置计数DP"] },
 					// 想再细分？直接在上面那行的 `}` 前面加 children: [...]，无限嵌套
 				],
 			},
-			{	
-				name: "数位DP", 
-				tags: ["数位DP"]
+			{
+				name: "数位DP",
+				tags: ["数位DP"],
 			},
 			{
 				name: "状压DP",
@@ -122,8 +116,8 @@ export const categoryTree: TopCategory[] = [
 				tags: ["换根DP"],
 			},
 			{
-				name : "区间DP",
-				tags: ["区间DP"]
+				name: "区间DP",
+				tags: ["区间DP"],
 			},
 		],
 	},
@@ -133,13 +127,14 @@ export const categoryTree: TopCategory[] = [
 		knowledgePoints: [
 			{ name: "延迟操作", tags: ["优先队列", "延迟更新", "懒"] },
 			{ name: "双向链表", tags: ["双向链表"] },
-			{name :"维护第k大", tags: ['维护第k大']},
-			{name :"树状数组", tags: ["树状数组","树状数组板子"]},
-			{name : "线段树", 
-				tags : ["线段树"],
-				children : [
-					{name : "线段树基础模板", tags : ["线段树基础模板"]},
-					{name : "线段树经典", tags : ["线段树经典"]},
+			{ name: "维护第k大", tags: ["维护第k大"] },
+			{ name: "树状数组", tags: ["树状数组", "树状数组板子"] },
+			{
+				name: "线段树",
+				tags: ["线段树"],
+				children: [
+					{ name: "线段树基础模板", tags: ["线段树基础模板"] },
+					{ name: "线段树经典", tags: ["线段树经典"] },
 				],
 			},
 		],
@@ -148,36 +143,38 @@ export const categoryTree: TopCategory[] = [
 		name: "字符串",
 		icon: "material-symbols:abc",
 		knowledgePoints: [
-			{ 	name: "子序列自动机", 
-				tags: ["子序列自动机"]
-			},
+			{ name: "子序列自动机", tags: ["子序列自动机"] },
 			{
-				name : "Z函数",
-				tags: ["Z函数"]
+				name: "Z函数",
+				tags: ["Z函数"],
 			},
 			{
 				name: "Manacher",
-				tags: ["Manacher"]	
+				tags: ["Manacher"],
 			},
 			{
 				name: "01-Trie",
-				tags: ["01-Trie"]
+				tags: ["01-Trie"],
 			},
 			{
 				name: "字符串哈希",
-				tags: ["字符串哈希"]
+				tags: ["字符串哈希"],
 			},
 			{
 				name: "最小表示法",
-				tags: ["最小表示法"]
+				tags: ["最小表示法"],
 			},
 			{
 				name: "AC 自动机",
-				tags: ["AC 自动机"]
+				tags: ["AC自动机"],
 			},
 			{
 				name: "KMP 自动机",
-				tags: ["KMP 自动机"]
+				tags: ["KMP自动机"],
+			},
+			{
+				name: "KMP",
+				tags: ["KMP"],
 			},
 		],
 	},
@@ -188,8 +185,8 @@ export const categoryTree: TopCategory[] = [
 			{ name: "快速幂", tags: ["快速幂"] },
 			{ name: "公式变换 / 容斥", tags: ["公式变换", "斥容原理"] },
 			{ name: "数论分块", tags: ["数论分块"] },
-			{ name: "线性基", tags : ["线性基"]},
-			{ name: "二进制操作集合", tags : ["二进制操作集合"]},
+			{ name: "线性基", tags: ["线性基"] },
+			{ name: "二进制操作集合", tags: ["二进制操作集合"] },
 		],
 	},
 	{
@@ -198,8 +195,8 @@ export const categoryTree: TopCategory[] = [
 		knowledgePoints: [
 			{ name: "异或前缀和", tags: ["异或前缀和"] },
 			{ name: "前缀和", tags: ["前缀和"] },
-			{ name : "二维后缀最大值", tags: ["二维后缀最大值"]},
-			{ name : "高维前缀和", tags : ["高维前缀和"]},
+			{ name: "二维后缀最大值", tags: ["二维后缀最大值"] },
+			{ name: "高维前缀和", tags: ["高维前缀和"] },
 		],
 	},
 	{
@@ -212,7 +209,7 @@ export const categoryTree: TopCategory[] = [
 		icon: "material-symbols:construction",
 		knowledgePoints: [
 			{ name: "可达性构造", tags: ["可达性构造"] },
-			{ name: "区间约束构造", tags: ["区间约束构造"]},
+			{ name: "区间约束构造", tags: ["区间约束构造"] },
 		],
 	},
 	{
@@ -235,15 +232,13 @@ export const categoryTree: TopCategory[] = [
 		icon: "material-symbols:casino-outline",
 		knowledgePoints: [
 			{
-			name: "单调量 / 奇偶博弈",
-			tags: ["不变量博弈", "奇偶博弈"],
-			children: [
-					{ name: "树上博弈", tags: ["树上博弈"] },
-				],
+				name: "单调量 / 奇偶博弈",
+				tags: ["不变量博弈", "奇偶博弈"],
+				children: [{ name: "树上博弈", tags: ["树上博弈"] }],
 			},
 			{
-			name: "配对策略",
-			tags: ["配对策略"],
+				name: "配对策略",
+				tags: ["配对策略"],
 			},
 		],
 	},
@@ -257,7 +252,7 @@ export const categoryTree: TopCategory[] = [
 			},
 			{
 				name: "逆序处理",
-				tags : ["逆序处理"],
+				tags: ["逆序处理"],
 			},
 		],
 	},
