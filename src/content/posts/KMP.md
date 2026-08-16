@@ -155,7 +155,7 @@ int main ()
 
 </style>
 <div style="text-align: center; margin: 20px 0;">
-  <a href="https://vjudge.net/problem/%E6%B4%9B%E8%B0%B7-P3375" target="_blank" class="problem-link">
+  <a href="https://www.nowcoder.com/practice/7f8a8553ddbf4eaab749ec988726702b" target="_blank" class="problem-link">
     🚀 题目传送门
   </a>
 </div>
